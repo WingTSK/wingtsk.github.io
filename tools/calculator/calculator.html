@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale1.0">
+  <title>ドロー確率計算機 (Beta)｜WingTSK's Project</title>
+  <link rel="stylesheet" type="text/css" href="./calculator.css">
+</head>
+<body>
+<script type="text/javascript" src="./draw-calculator.js"></script>
+<script type="text/javascript" src="../../external/js/rawdeflate.js"></script>
+<script type="text/javascript" src="../../external/js/rawinflate.js"></script>
+<script type="text/javascript" src="../../external/js/base64.js"></script>
+<script>
+  let rows_counter = [];
+  let cols_counter = [];
+  let queryParam = [];
+  let paramItem = [];
+  let urlparam = location.search.substring(1);
+  if (urlparam.length){
+    let param = urlparam.split("&");
+    for (let i = 0; i < param.length; i++){
+      paramItem[0] = urlparam.substring(0,urlparam.indexOf("="));
+      paramItem[1] = urlparam.substring(urlparam.indexOf("=")+1);
+      queryParam[paramItem[0]] = paramItem[1];
+    }
+  };
+</script>
+  <h2>ドロー確率計算機 (Beta)</h2>
+  <p>遊戯王OCGなどのカードゲームで、特定のカードや組み合わせをドローできる確率を計算できます。<br>条件が複数ある場合にも対応しています。
+  <br>※javascriptが有効になっていない場合は動作しません。<br>
+  ※複雑な条件を設定した場合、計算に時間がかかったり、フリーズする場合があります。ご了承ください。</p>
+  <div class="chkmenu">
+    <input type="checkbox" id="checkbox1" style="display: none;"><label for="checkbox1">▼▽使い方（クリックで展開）▽▼</label>
+    <div class="chkcontent" id="chkcontent1">
+    「デッキ枚数：」の入力欄には、確率を計算したいデッキ（山札）の枚数を、「手札枚数：」の入力欄には、引いている手札の枚数を入力します。<br>
+    例えば、「40枚デッキから5枚引いた場合」の確率を計算したい場合、「デッキ枚数：」には「40」、「手札枚数：」には「5」と、それぞれ入力してください。<br><br>
+    「条件登録:」の入力欄では、カード名、デッキ投入枚数、確率を計算したい条件を入力します。<br>
+    「カード名」と「投入枚数」の入力欄には、カード名と、そのカードをデッキに投入している枚数を入力します。<br><br>
+    「条件：」には、確率を計算したい手札の条件を入力します。<br>
+    （条件の詳しい入力方法については、下の「条件について」をご確認ください。）<br>
+    「カード追加」ボタンや「条件追加」ボタンで、カードや条件の追加を行う事ができます。
+    </div>
+  </div>
+  <br>
+  <div class="chkmenu">
+    <input type="checkbox" id="checkbox2" style="display: none;"><label for="checkbox2">▼▽条件について（クリックで展開）▽▼</label>
+    <div class="chkcontent" id="chkcontent2">
+    条件は枚数と、モードを設定します。<br>
+    モードは、<br>
+    ・（設定枚数）以上ドロー<br>
+    ・（設定枚数）ちょうどドロー<br>
+    ・（設定枚数）以上デッキに残す<br>
+    ・（設定枚数）ちょうどデッキに残す<br>
+    これらの４種類があります。確率計算したい状況に合わせて設定してください。<br><br>
+    また、一つの条件（同じ行）に複数カードの条件を設定した場合、それぞれを同時に満たす確率を計算します。<br>
+    例１：【条件１】に"「カード１」を１枚以上ドロー"と"「カード２」を１枚ちょうどドロー"を、それぞれ設定した場合<br>
+    ⇒「カード１」を１枚以上ドローし、かつ、「カード２」を１枚ちょうどドローする場合の確率を求めます。<br>
+    （○：「カード１」を１枚ドロー、「カード２」を１枚ドローするパターン）<br>
+    （×：「カード１」を２枚ドロー、「カード２」をドローしないパターン）<br><br>
+    さらに、複数の条件を設定した場合、それぞれの条件のいずれかを満たす確率を計算します。<br>
+    例２：【条件１】に"「カード１」を２枚以上ドロー"を、【条件２】に"「カード１」を１枚ちょうどドロー"と"「カード２」を１枚ちょうどドロー"を、それぞれ設定した場合<br>
+    ⇒「カード１」を１枚以上ドローする場合、または、「カード１」と「カード２」をそれぞれ１枚ちょうどずつドローする場合、いずれか（または両方）に該当する確率を求めます。<br>
+    （○：「カード１」を１枚ドロー、「カード２」を１枚ドローするパターン（条件２に該当））<br>
+    （○：「カード１」を２枚ドロー、「カード２」をドローしないパターン（条件１に該当））<br>
+    （×：「カード１」を１枚ドロー、「カード２」を２枚ドローするパターン）<br><br>
+    このように条件を組み合わせていくことで、簡単なパターンから複雑なパターンまで計算する事ができます。
+    </div>
+  </div>
+  <br>
+  <input type="button" value="計算!" onclick="printprintDrawCalc();">
+  <br>
+  <table><tbody><tr><td nowrap="">
+  <span id="output">
+  条件を設定してください
+  </span>
+  </td><td nowrap="">
+  計算結果を共有
+  <input type="text" name="export_box" id="export_box" style="width: 0px; border: solid 0px; padding: 0px;" readonly><br>
+  <input type="button" value="URLをコピー" onclick='copyToClipboard("#export_box");'>
+  </td></tr></tbody></table>
+  <br>
+  <div>
+    <form name="es_calculator" autocomplete="off">
+    <table><tbody><tr><td>デッキ枚数:</td><td><input type="number" name="deck" id="deck_n" required="required" value="40" min="0" max="255" placeholder="デッキ枚数" onclick="this.select();">枚</td></tr>
+    <tr><td>手札枚数:</td><td><input type="number" name="hand" id="hand_n" required="required" value="5" min="0" max="255" placeholder="手札枚数" onclick="this.select();">枚</td></tr></tbody></table>
+    <br>
+    <input type="button" value="クリア" onclick="printDrawClear();">
+    <div style="display: flex;">
+      <div>
+        <table id="esc_table">
+          <tbody><tr>
+            <td class="fixed00" nowrap="">条件登録:</td>
+          </tr>
+          <tr>
+            <td class="fixed01" nowrap="">カード名<br>／デッキ投入枚数</td>
+          </tr>
+          </tbody>
+        </table>
+        <input type="button" value="条件追加" onclick="insertRow('esc_table')">
+      </div>
+      <div><input type="button" value="カード追加" onclick="insertColumn('esc_table')"></div>
+    </div>
+  </form>
+  <br>
+  <input type="button" value="計算!" onclick="printDrawCalc();">
+  </div>
+  <div id="output">
+  </div>
+  <footer>
+    <hr />
+    <nav id="footerrnav">
+    </nav>
+    &copy;2020 WingTSK
+  </footer>
+<script>
+  if (queryParam.x && queryParam.x.length){
+    condition_in(queryParam.x);
+  }else{
+    insertRow('esc_table');
+    insertColumn('esc_table');
+  }
+</script>
+</body>
+</html>
