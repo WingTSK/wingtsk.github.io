@@ -63,9 +63,9 @@ function combination(n, r){
 
 function pascal_triangle(n){
   let a = [];
-  for (i = 0; i <= n; i++){
+  for (let i = 0; i <= n; i++){
     let b = [];
-    for (j = 0; j <= i; j++){
+    for (let j = 0; j <= i; j++){
       if (i == 0 || j == 0){
         b.push(1);
       }else{
@@ -248,7 +248,7 @@ function printDrawClear(){
 }
 
 function condition_ex(){
-let src =  + document.querySelector("#deck_n").value
+  let src =  + document.querySelector("#deck_n").value
   + "_$" + document.querySelector("#hand_n").value
   + "_$" + rows_counter.length
   + "_$" + cols_counter.length + "_$";
@@ -270,16 +270,20 @@ let src =  + document.querySelector("#deck_n").value
       + "_$" + document.querySelectorAll(".condition_m")[ i ].value;
   }
   let dst = "x=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(src)));
-  document.querySelector("#export_box").value = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + dst;
+  let res = document.querySelector("#output").innerText;
+  for (let i = 0; i < rows_counter.length; i++){
+    res = res + "_$" + document.querySelectorAll(".row_result")[ i ].innerText;
+  }
+  let rdst = "y=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(res)))
+  document.querySelector("#export_box").value = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + dst + "&" + rdst;
 }
 
-function condition_in(src){
-  let dst = Base64.btou(RawDeflate.inflate(Base64.fromBase64(src)));
+function condition_in(){
+  let dst = Base64.btou(RawDeflate.inflate(Base64.fromBase64(queryParam.x)));
   let c = dst.split("_$_$");
   c[0]=c[0].split("_$");
   c[1]=c[1].split("_$");
   c[2]=c[2].split("_$");
-  
   document.querySelector("#deck_n").value = c[0][0];
   document.querySelector("#hand_n").value = c[0][1];
   for (let r = 0; r < c[0][2]; r++){
@@ -296,7 +300,17 @@ function condition_in(src){
     document.querySelectorAll(".condition_n")[ i ].value = c[2][ 2*i ];
     document.querySelectorAll(".condition_m")[ i ].value = c[2][ 2*i + 1 ];
   }
-  printDrawCalc();
+  if (queryParam.y && queryParam.y.length){
+    let rdst = Base64.btou(RawDeflate.inflate(Base64.fromBase64(queryParam.y)));
+    let d = rdst.split("_$");
+    document.querySelector("#output").innerText = d[0];
+    for (let i = 0; i < rows_counter.length; i++){
+      document.querySelectorAll(".row_result")[ i ].innerText = d[ i + 1 ];
+    }
+    document.querySelector("#export_box").value = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + queryParam.x + "&" + queryParam.y;
+  }else{
+    printDrawCalc();
+  }
 }
 
 function insertRow(id) {

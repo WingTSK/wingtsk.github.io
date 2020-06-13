@@ -20,8 +20,8 @@
   if (urlparam.length){
     let param = urlparam.split("&");
     for (let i = 0; i < param.length; i++){
-      paramItem[0] = urlparam.substring(0,urlparam.indexOf("="));
-      paramItem[1] = urlparam.substring(urlparam.indexOf("=")+1);
+      paramItem[0] = param[i].substring(0,urlparam.indexOf("="));
+      paramItem[1] = param[i].substring(urlparam.indexOf("=")+1);
       queryParam[paramItem[0]] = paramItem[1];
     }
   };
@@ -115,7 +115,7 @@
   </footer>
 <script>
   if (queryParam.x && queryParam.x.length){
-    condition_in(queryParam.x);
+    condition_in();
   }else{
     insertRow('esc_table');
     insertColumn('esc_table');
