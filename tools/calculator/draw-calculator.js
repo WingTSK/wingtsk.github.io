@@ -249,25 +249,25 @@ function printDrawClear(){
 
 function condition_ex(){
 let src =  + document.querySelector("#deck_n").value
-  + "$" + document.querySelector("#hand_n").value
-  + "$" + rows_counter.length
-  + "$" + cols_counter.length + "$";
+  + "_$" + document.querySelector("#hand_n").value
+  + "_$" + rows_counter.length
+  + "_$" + cols_counter.length + "_$";
   for (let i = 0; i < cols_counter.length; i++){
     let c = "0";
     if (document.querySelectorAll(".cardnum")[ i ].value.length){
       c = document.querySelectorAll(".cardnum")[ i ].value;
     }
-    src = src + "$" + document.querySelectorAll(".cardname")[ i ].value
-      + "$" + c;
+    src = src + "_$" + document.querySelectorAll(".cardname")[ i ].value
+      + "_$" + c;
   }
-  src = src + "$";
+  src = src + "_$";
   for (let i = 0; i < cols_counter.length * rows_counter.length; i++){
     let cn = "0";
     if (document.querySelectorAll(".condition_n")[ i ].value.length){
     cn = document.querySelectorAll(".condition_n")[ i ].value;
     }
-    src = src + "$" + cn
-      + "$" + document.querySelectorAll(".condition_m")[ i ].value;
+    src = src + "_$" + cn
+      + "_$" + document.querySelectorAll(".condition_m")[ i ].value;
   }
   let dst = "x=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(src)));
   document.querySelector("#export_box").value = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + dst;
@@ -275,10 +275,10 @@ let src =  + document.querySelector("#deck_n").value
 
 function condition_in(src){
   let dst = Base64.btou(RawDeflate.inflate(Base64.fromBase64(src)));
-  let c = dst.split("$$");
-  c[0]=c[0].split("$");
-  c[1]=c[1].split("$");
-  c[2]=c[2].split("$");
+  let c = dst.split("_$_$");
+  c[0]=c[0].split("_$");
+  c[1]=c[1].split("_$");
+  c[2]=c[2].split("_$");
   
   document.querySelector("#deck_n").value = c[0][0];
   document.querySelector("#hand_n").value = c[0][1];
