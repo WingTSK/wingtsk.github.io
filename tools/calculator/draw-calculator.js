@@ -312,7 +312,7 @@ function condition_in(){
     for (let i = 0; i < rows_counter.length; i++){
       document.querySelectorAll(".row_result")[ i ].innerText = d[ i + 1 ];
     }
-    let url = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + queryParam.x + "&" + queryParam.y;
+    let url = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?x=" + queryParam.x + "&y=" + queryParam.y;
     document.querySelector("#export_box").value = url;
     document.querySelector("#tweet-area").children[0].remove();
     twttr.widgets.createShareButton(url, document.getElementById('tweet-area'), { text: "ドロー確率計算機 (Beta)\n確率"+d[0]+"でした！\n詳細は->" });
