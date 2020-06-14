@@ -91,20 +91,19 @@ function combination_pt(n, r, pt){
 }
 
 function chkMultiHandPat(m, h, g, c){
-  let n = 0;
   let p = [];
   for (let i = 0; i < g.length; i++){
     p[i] = 0;
   }
-  return chkMDC(m, h, g, c, p, n);
+  return chkMDC(m, h, g, c, p, 0, 0);
 }
-function chkMDC(m, h, g, c, p, n){
+function chkMDC(m, h, g, c, p, n, v){
   let r = 0;
   for (p[n] = 0; p[n] <= g[n]; p[n]++){
     if (n < p.length - 1){
-      r = r + chkMDC(m, h, g, c, p, n + 1);
+      r = r + chkMDC(m, h, g, c, p, n + 1, v + p[n]);
     }else{
-      if (sumArray(p) <= h){
+      if (v + p[n] <= h){
         if (ccMDC(m, g, c, p) == 1){
           r = r + multiAryV(m, p, 0);
         }
