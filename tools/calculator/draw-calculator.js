@@ -245,13 +245,15 @@ function printDrawClear(){
 }
 
 function condition_ex(){
+  let rows = rows_counter.length;
+  let cols = cols_counter.length;
   let src =  + document.querySelector("#deck_n").value
   + "_$" + document.querySelector("#hand_n").value
-  + "_$" + rows_counter.length
-  + "_$" + cols_counter.length + "_$";
+  + "_$" + String(rows)
+  + "_$" + String(cols) + "_$";
   let cng = document.querySelectorAll(".cardnum");
   let cnameg = document.querySelectorAll(".cardname");
-  for (let i = 0; i < cols_counter.length; i++){
+  for (let i = 0; i < cols; i++){
     let c = "0";
     if (cng[ i ].value.length){
       c = cng[ i ].value;
@@ -260,10 +262,10 @@ function condition_ex(){
       + "_$" + c;
   }
   src = src + "_$";
-  for (let i = 0; i < cols_counter.length * rows_counter.length; i++){
+  let cong = document.querySelectorAll(".condition_n");
+  let comg = document.querySelectorAll(".condition_m");
+  for (let i = 0; i < cols * rows; i++){
     let cn = "0";
-    let cong = document.querySelectorAll(".condition_n");
-    let comg = document.querySelectorAll(".condition_m");
     if (cong[ i ].value.length){
     cn = cong[ i ].value;
     }
@@ -273,7 +275,7 @@ function condition_ex(){
   let dst = "x=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(src)));
   let res = document.querySelector("#output").innerText;
   let rsg = document.querySelectorAll(".row_result");
-  for (let i = 0; i < rows_counter.length; i++){
+  for (let i = 0; i < rows; i++){
     res = res + "_$" + rsg[ i ].innerText;
   }
   let rdst = "y=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(res)))
