@@ -9,32 +9,28 @@ function makeMultiHandPat(d, h, g, pt){
     g = [g];
   }
   let p = [];
-  let n = 0;
   for (let i = 0; i < g.length; i++){
     p[i] = 0;
   }
-  let c = multiDCombination(d, h, g, p, n, pt);
+  let c = multiDCombination(d, h, g, p, 0, 0, pt);
   return c;
 }
 
-function multiDCombination(d, h, g, p, n, pt){
+function multiDCombination(d, h, g, p, pv, n, pt){
   let a = [];
   let dg = d - sumArray(g);
   for (p[n]=0; p[n] <= g[n]; p[n]++){
-    let v = 1;
-    if (p.length > n + 1){
-      a.push(multiDCombination(d, h, g, p, n + 1, pt))
-    }else{
-      let poi = sumArray(p);
-      if (h >= poi){
+    if (pv + p[n] <= h){
+      let v = 1;
+      if (p.length > n + 1){
+        a.push(multiDCombination(d, h, g, p, pv + p[n], n + 1, pt))
+      }else{
         for (let j = 0; j < p.length; j++){
           v = v * combination_pt(g[j], p[j], pt);
         }
-        v = v * combination_pt(dg, h - poi, pt);
-      }else{
-        v = 0;
+        v = v * combination_pt(dg, h - (pv + p[n]), pt);
+        a.push(v);
       }
-      a.push(v);
     }
   }
   return a;
@@ -99,15 +95,13 @@ function chkMultiHandPat(m, h, g, c){
 }
 function chkMDC(m, h, g, c, p, n, v){
   let r = 0;
-  for (p[n] = 0; p[n] <= g[n]; p[n]++){
+  for (p[n] = 0; v + p[n] <= h; p[n]++){
     if (n < p.length - 1){
       r = r + chkMDC(m, h, g, c, p, n + 1, v + p[n]);
     }else{
-      if (v + p[n] <= h){
         if (ccMDC(m, g, c, p) == 1){
           r = r + multiAryV(m, p, 0);
         }
-      }
     }
   }
   return r;
@@ -145,13 +139,13 @@ function multiAryV(m, p, n){
 
 function makecondition(g){
   let c = [];
+  let numgroup = document.querySelectorAll(".condition_n");
+  let modegroup = document.querySelectorAll(".condition_m");
   for (let i = 0; i < rows_counter.length; i++){
     let con =[];
     for (let j = 0; j < cols_counter.length; j++){
-      let strn = '[name="condition_n_' + String(rows_counter[i]) + '_' + String(cols_counter[j]) + '"]';
-      let strm = '[name="condition_m_' + String(rows_counter[i]) + '_' + String(cols_counter[j]) + '"]';
-      let numc = document.querySelector(strn).value;
-      let mode = document.querySelector(strm).value;
+      let numc = numgroup[i * cols_counter.length + j].value;
+      let mode = modegroup[i * cols_counter.length + j].value;
       let numg = g[j];
       if (mode == "0"){
        let ca =[];
@@ -251,27 +245,32 @@ function condition_ex(){
   + "_$" + document.querySelector("#hand_n").value
   + "_$" + rows_counter.length
   + "_$" + cols_counter.length + "_$";
+  let cng = document.querySelectorAll(".cardnum");
+  let cnameg = document.querySelectorAll(".cardname");
   for (let i = 0; i < cols_counter.length; i++){
     let c = "0";
-    if (document.querySelectorAll(".cardnum")[ i ].value.length){
-      c = document.querySelectorAll(".cardnum")[ i ].value;
+    if (cng[ i ].value.length){
+      c = cng[ i ].value;
     }
-    src = src + "_$" + document.querySelectorAll(".cardname")[ i ].value
+    src = src + "_$" + cnameg[ i ].value
       + "_$" + c;
   }
   src = src + "_$";
   for (let i = 0; i < cols_counter.length * rows_counter.length; i++){
     let cn = "0";
-    if (document.querySelectorAll(".condition_n")[ i ].value.length){
-    cn = document.querySelectorAll(".condition_n")[ i ].value;
+    let cong = document.querySelectorAll(".condition_n");
+    let comg = document.querySelectorAll(".condition_m");
+    if (cong[ i ].value.length){
+    cn = cong[ i ].value;
     }
     src = src + "_$" + cn
-      + "_$" + document.querySelectorAll(".condition_m")[ i ].value;
+      + "_$" + comg[ i ].value;
   }
   let dst = "x=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(src)));
   let res = document.querySelector("#output").innerText;
+  let rsg = document.querySelectorAll(".row_result");
   for (let i = 0; i < rows_counter.length; i++){
-    res = res + "_$" + document.querySelectorAll(".row_result")[ i ].innerText;
+    res = res + "_$" + rsg[ i ].innerText;
   }
   let rdst = "y=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(res)))
   document.querySelector("#export_box").value = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + dst + "&" + rdst;
