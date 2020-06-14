@@ -194,7 +194,11 @@ function printDrawCalc(){
       let multi = makeMultiHandPat(deck, hand, group, pt);
       let condition = makecondition(group);
       let result = chkMultiHandPat(multi, hand, group, condition);
-      document.querySelector('[id="output"]').innerText = "計算結果："+String(Math.round(result/combination_pt(deck,hand,pt)*1000000)/10000)+"％\n("+result+"／"+combination_pt(deck,hand,pt)+"通り)";
+      let str0 = "計算結果："+String(Math.round(result/combination_pt(deck,hand,pt)*1000000)/10000)+"％\n";
+      if (Number.isSafeInteger(combination_pt(deck,hand,pt))){
+        str0 = str0 + "（" + result+"／"+combination_pt(deck,hand,pt)+"通り）";
+      }
+      document.querySelector('[id="output"]').innerText = str0;
       let cl = condition.length;
       for (let k = 0; k < cl; k++){
         let scon = [];
