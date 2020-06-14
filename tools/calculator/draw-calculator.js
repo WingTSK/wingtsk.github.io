@@ -328,7 +328,7 @@ function insertRow(id) {
     let cell = row.insertCell(-1);
     cell.innerHTML = '<input type="number" class="condition_n" name="condition_n_'
       + String(r) + '_' + String(cols_counter[i - 1]) + '" size="15" placeholder="枚数" min="0" max="255" onclick="this.select();">枚<br><select class="condition_m" name="condition_m_'
-      + String(r) + '_' + String(cols_counter[i - 1]) + '" size="1"><option disabled selected value>－－－－</option><option selected value="0">以上ドロー</option><option value="1">ちょうどドロー</option><option value="2">以上デッキに残す</option><option value="3">ちょうどデッキに残す</option></select>';
+      + String(r) + '_' + String(cols_counter[i - 1]) + '" size="1"><option disabled selected value>▼▼ モード ▼▼</option><option selected value="0">以上ドロー</option><option value="1">ちょうどドロー</option><option value="2">以上デッキに残す</option><option value="3">ちょうどデッキに残す</option></select>';
   }
 }
 
