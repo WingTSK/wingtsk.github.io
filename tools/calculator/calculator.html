@@ -8,10 +8,11 @@
   <link rel="stylesheet" type="text/css" href="./calculator.css">
 </head>
 <body>
-<script type="text/javascript" src="./draw-calculator.js"></script>
+<script type="text/javascript" src="./draw-calculator.js?20200614"></script>
 <script type="text/javascript" src="../../external/js/rawdeflate.js"></script>
 <script type="text/javascript" src="../../external/js/rawinflate.js"></script>
 <script type="text/javascript" src="../../external/js/base64.js"></script>
+<script type="text/javascript" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <script>
   let rows_counter = [];
   let cols_counter = [];
@@ -80,6 +81,7 @@
   計算結果を共有
   <input type="text" name="export_box" id="export_box" style="width: 0px; border: solid 0px; padding: 0px;" readonly><br>
   <input type="button" value="URLをコピー" onclick='copyToClipboard("#export_box");'>
+  <span id="tweet-area"><span></span></span>
   </td></tr></tbody></table>
   <br>
   <div>
@@ -121,6 +123,13 @@
   }else{
     insertRow('esc_table');
     insertColumn('esc_table');
+    document.querySelector("#tweet-area").children[0].remove();
+    twttr.widgets.createShareButton("https://wingtsk.github.io/tools/calculator/calculator.html",
+      document.getElementById('tweet-area'),
+      {
+        text: "ドロー確率計算機 (Beta)\n"
+      }
+    );
   }
 </script>
 </body>

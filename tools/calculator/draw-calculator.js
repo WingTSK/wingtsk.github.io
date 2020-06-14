@@ -195,10 +195,10 @@ function printDrawCalc(){
       let condition = makecondition(group);
       let result = chkMultiHandPat(multi, hand, group, condition);
       let str0 = "計算結果："+String(Math.round(result/combination_pt(deck,hand,pt)*1000000)/10000)+"％\n";
-      if (Number.isSafeInteger(combination_pt(deck,hand,pt))){
+      if (Math.pow(2,53)-1 >= combination_pt(deck,hand,pt)){
         str0 = str0 + "（" + result+"／"+combination_pt(deck,hand,pt)+"通り）";
       }
-      document.querySelector('[id="output"]').innerText = str0;
+      document.querySelector("#output").innerText = str0;
       let cl = condition.length;
       for (let k = 0; k < cl; k++){
         let scon = [];
@@ -214,7 +214,7 @@ function printDrawCalc(){
       if (sumArray(group) > deck){
         err = "エラー：登録カードの合計枚数がデッキ枚数を超えています。\n";
       }
-      document.querySelector('[id="output"]').innerText = err;
+      document.querySelector("#output").innerText = err;
     }
   }else{
     let err = "";
@@ -224,7 +224,7 @@ function printDrawCalc(){
     if (!(cols_counter.length)){
       err = "エラー：カードが登録されていません。\n";
     }
-    document.querySelector('[id="output"]').innerText = err;
+    document.querySelector("#output").innerText = err;
   }
 }
 
@@ -277,7 +277,10 @@ function condition_ex(){
     res = res + "_$" + rsg[ i ].innerText;
   }
   let rdst = "y=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(res)))
-  document.querySelector("#export_box").value = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + dst + "&" + rdst;
+  let url = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + dst + "&" + rdst;
+  document.querySelector("#export_box").value = url;
+  document.querySelector("#tweet-area").children[0].remove();
+  twttr.widgets.createShareButton(url, document.getElementById('tweet-area'), { text: "ドロー確率計算機 (Beta)\n確率"+document.querySelector("#output").innerText+"でした！\n詳細は->" });
 }
 
 function condition_in(){
@@ -309,7 +312,10 @@ function condition_in(){
     for (let i = 0; i < rows_counter.length; i++){
       document.querySelectorAll(".row_result")[ i ].innerText = d[ i + 1 ];
     }
-    document.querySelector("#export_box").value = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + queryParam.x + "&" + queryParam.y;
+    let url = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + queryParam.x + "&" + queryParam.y;
+    document.querySelector("#export_box").value = url;
+    document.querySelector("#tweet-area").children[0].remove();
+    twttr.widgets.createShareButton(url, document.getElementById('tweet-area'), { text: "ドロー確率計算機 (Beta)\n確率"+d[0]+"でした！\n詳細は->" });
   }else{
     printDrawCalc();
   }
