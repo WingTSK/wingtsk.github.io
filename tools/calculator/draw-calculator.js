@@ -1,45 +1,41 @@
 /**
 draw-calculator.js
-
+version 0.1.0
 Copyright (c) 2020 WingTSK
 */
-    
-function makeMultiHandPat(d, h, g, pt){
-  if (typeof(g) == "number"){
-    g = [g];
-  }
-  let p = [];
-  for (let i = 0; i < g.length; i++){
-    p[i] = 0;
-  }
-  let c = multiDCombination(d, h, g, p, 0, 0, pt);
-  return c;
-}
-
-function multiDCombination(d, h, g, p, pv, n, pt){
-  let a = [];
-  let dg = d - sumArray(g);
-  for (p[n]=0; p[n] <= g[n]; p[n]++){
-    if (pv + p[n] <= h){
-      let v = 1;
-      if (p.length > n + 1){
-        a.push(multiDCombination(d, h, g, p, pv + p[n], n + 1, pt))
-      }else{
-        for (let j = 0; j < p.length; j++){
-          v = v * combination_pt(g[j], p[j], pt);
-        }
-        v = v * combination_pt(dg, h - (pv + p[n]), pt);
-        a.push(v);
-      }
+  let cards_counter = [];
+  let cg_index = [];
+  let con_counter = [];
+  let queryParam = [];
+  let paramItem = [];
+  let urlparam = location.search.substring(1);
+  if (urlparam.length){
+    let param = urlparam.split("&");
+    for (let i = 0; i < param.length; i++){
+      paramItem[0] = param[i].substring(0,urlparam.indexOf("="));
+      paramItem[1] = param[i].substring(urlparam.indexOf("=")+1);
+      queryParam[paramItem[0]] = paramItem[1];
     }
+  };
+
+/* const */
+const $cid = function(cid){return document.querySelector('[cid="' + String(cid) + '"]');};
+const $cgid = function(cgid){return document.querySelector('[cgid="' + String(cgid) + '"]');};
+const $con = function(cgid, conid){return $cgid(cgid).querySelector('[conid="' + String(conid) + '"].condition');};
+const $conand = function(cgid, conid){return $cgid(cgid).querySelector('[conid="' + String(conid) + '"].andblock');};
+
+Array.prototype.uniq = function (){
+  if (!Array.from){
+    return this.map(function (x){return JSON.stringify(x)}).filter(function (x, i, self){return self.indexOf(x) === i;}).map(function (x){return JSON.parse(x)});
+  }else{
+    return Array.from(new Set(this.map(function (x){return JSON.stringify(x)}))).map(function (x){return JSON.parse(x)});
   }
-  return a;
 }
 
 function sumArray(ary){
   let s = 0;
-  for (let i = 0; i < ary.length; i++){
-      s = s + ary[i];
+  for (let i = 0; i < ary.length; i = (i+1)){
+    s = s + ary[i];
   }
   return s;
 }
@@ -48,7 +44,7 @@ function combination(n, r){
   if (n >= r && r >= 0){
     let k = Math.min(r, n - r);
     let c = 1;
-    for (let i = 0; i < k; i++){
+    for (let i = 0; i < k; i = (i+1)){
       c = c * (n - i) / (1 + i);
     }
     return c;
@@ -59,14 +55,14 @@ function combination(n, r){
 
 function pascal_triangle(n){
   let a = [];
-  for (let i = 0; i <= n; i++){
+  for (let i = 0; i <= n; i = (i+1)){
     let b = [];
-    for (let j = 0; j <= i; j++){
-      if (i == 0 || j == 0){
+    for (let j = 0; j <= i/2; j = (j+1)){
+      if (i === 0 || j === 0){
         b.push(1);
       }else{
-        if (j == i){
-          b.push(a[i - 1][j - 1]);
+        if (j === i / 2){
+          b.push(a[i - 1][j - 1] * 2);
         }else{
           b.push(a[i - 1][j - 1] + a[i - 1][j]);
         }
@@ -78,316 +74,765 @@ function pascal_triangle(n){
 }
 
 function combination_pt(n, r, pt){
-  if (n < r){
-    return 0;
-  }else{
-    let k = Math.min(r, n - r);
-    return pt[n][k];
-  }
-}
-
-function chkMultiHandPat(m, h, g, c){
-  let p = [];
-  for (let i = 0; i < g.length; i++){
-    p[i] = 0;
-  }
-  return chkMDC(m, h, g, c, p, 0, 0);
-}
-function chkMDC(m, h, g, c, p, n, v){
-  let r = 0;
-  for (p[n] = 0; v + p[n] <= h; p[n]++){
-    if (n < p.length - 1){
-      r = r + chkMDC(m, h, g, c, p, n + 1, v + p[n]);
+  if (n >= r && r >= 0){
+    if (typeof(pt) !== "undefined"){
+      let k = Math.min(r, n - r);
+      return pt[n][k];
     }else{
-        if (ccMDC(m, g, c, p) == 1){
-          r = r + multiAryV(m, p, 0);
-        }
+      return combination(n, r);
     }
+  }else{
+    return 0;
   }
-  return r;
 }
 
-function ccMDC(m, g, c0, p){
-  let l = c0.length;
-  let t = 1;
-  let tc = 0;
-  let cx = c0[l - 1].slice();
-  if (l > 1){
-    let c1 = c0.slice();
-    c1.length = l - 1;
-    tc = ccMDC(m, g, c1, p);
-  }
-  if (tc == 0){
-    for (let i = 0; i < cx.length; i++){
-      if (p[i] < cx[i][0] || p[i] > cx[i][1]){
-        t = 0
+function makeDrawPattern(deck, hand, cnums, pt){
+  let other = deck - sumArray(cnums);
+  let cnlen = cnums.length - 1;
+  let cv = 0;
+  let depth = 0;
+  let pattern = 1;
+  let rtn = [];
+  drawPatternCounter(hand, cnums, other, cnlen, cv, depth, pattern, pt, rtn);
+  return rtn;
+}
+
+function drawPatternCounter(hand, cnums, other, cnlen, cv, depth, pattern, pt, rtn){
+  let cd = cnums[depth];
+  for (let i = 0; i <= cd; i++){
+    if (cv + i <= hand){
+      let nextpattern = pattern * combination_pt(cd, i, pt);
+      if (cnlen > depth){
+        drawPatternCounter(hand, cnums, other, cnlen, cv + i, depth + 1, nextpattern, pt, rtn);
+      }else{
+        if (other >= hand - (cv + i)){
+          nextpattern = nextpattern * combination_pt(other, hand - (cv + i), pt);
+          rtn.push(nextpattern);
+        }
       }
     }
+  }
+}
+
+function makeCoordinates(deck, hand, cnums){
+  let other = deck - sumArray(cnums);
+  let coordinate = [];
+  let cv = 0;
+  let depth = 0;
+  for (let i = 0; i < cnums.length; i = (i+1)){
+    coordinate[i] = 0;
+  }
+  let rtn = [];
+  pushCoordinate(hand, cnums, other, coordinate, cv, depth, rtn);
+  return rtn.slice();
+}
+
+function pushCoordinate(hand, cnums, other, coordinate, cv, depth, rtn){
+  for (coordinate[depth] = 0; cv + coordinate[depth] <= hand; coordinate[depth] = (coordinate[depth] + 1)){
+    if (coordinate[depth] <= cnums[depth]){
+      if (depth < coordinate.length - 1){
+        pushCoordinate(hand, cnums, other, coordinate, cv + coordinate[depth], depth + 1, rtn);
+      }else{
+        if (other >= hand - (cv + coordinate[depth])){
+          rtn.push(coordinate.slice());
+        }
+      }
+    }
+  }
+}
+
+function calcResult(mkpat, hand, cnums, condition, coordinates){
+  let opt = [];
+  for (let i = 0, len = coordinates.length; i < len; i = (i+1)){
+    if (chkPattern(coordinates[i], condition)){
+      opt.push(1);
+    }else{
+      opt.push(0);
+    }
+  }
+  return sumArrayOpt(mkpat, opt);
+}
+
+function chkPattern(coordinate, condition){
+  let len = condition.length;
+  let t = 0;
+  let tc = 1;
+  for (let i = 0; i < len && t === 0; i = (i+1)){
+    tc = 1;
+    for (let j = 0, jl = condition[i].length; j < jl && tc === 1; j = (j+1)){
+      if (coordinate[j] < condition[i][j][0] || coordinate[j] > condition[i][j][1]){
+        tc = 0;
+      }
+    }
+    t = tc;
   }
   return t;
 }
 
-function multiAryV(m, p, n){
-  let v = 0;
-  if (n < p.length - 1){
-    v = multiAryV(m[p[n]], p, n+1);
-  }else{
-    v = m[p[n]];
+function sumArrayOpt(ary, optAry){
+  let s = 0, al = ary.length, ol = optAry.length;
+  if (al === ol){
+    for (let i = 0; i < al; i = (i+1)){
+      s = s + ary[i] * optAry[i];
+    }
   }
-  return v;
+  return s;
 }
 
-function makecondition(g){
-  let c = [];
-  let numgroup = document.querySelectorAll(".condition_n");
-  let modegroup = document.querySelectorAll(".condition_m");
-  for (let i = 0; i < rows_counter.length; i++){
-    let con =[];
-    for (let j = 0; j < cols_counter.length; j++){
-      let numc = numgroup[i * cols_counter.length + j].value;
-      let mode = modegroup[i * cols_counter.length + j].value;
-      let numg = g[j];
-      if (mode == "0"){
-       let ca =[];
-        ca.push(Number(numc));
-        ca.push(numg);
-        con.push(ca);
-      }else if (mode == "1"){
-        let ca =[];
-        ca.push(Number(numc));
-        ca.push(Number(numc));
-        con.push(ca);
-      }else if (mode == "2"){
-        let ca =[];
-        ca.push(0);
-        ca.push(numg - Number(numc));
-        con.push(ca);
-      }else if (mode == "3"){
-        let ca =[];
-        ca.push(numg - Number(numc));
-        ca.push(numg - Number(numc));
-        con.push(ca);
-      }else{
-        let ca =[];
-        ca.push(0);
-        ca.push(numg);
-        con.push(ca);
-      }
-    }
-    c.push(con);
+function makeDefaultCondition(cnums, vari){
+  let def = [];
+  for (let s = 0; s < vari; s = (s+1)){
+    let ary = [];
+    ary.push(0);
+    ary.push(cnums[s]);
+    def.push(ary.slice());
   }
-  return c;
+  return def;
 }
 
-function printDrawCalc(){
-  document.querySelector("#export_box").value = "";
-  if (rows_counter.length && cols_counter.length){
-    let deck = Number(document.querySelector('[name="deck"]').value);
-    let hand = Number(document.querySelector('[name="hand"]').value);
-    let group = [];
-    let pt = pascal_triangle(deck);
-    for (let j = 0; j < cols_counter.length; j++){
-      let str = '[name="group_' + String(cols_counter[j]) + '"]';
-      group.push(Number(document.querySelector(str).value));
+function makeGroupNums(group, cards, cnums){
+  let rtn = [];
+  for (let i = 0, len = group.length; i < len; i = (i+1)){
+    rtn.push(cnums[cards.indexOf(group[i])]);
+  }
+  return rtn;
+}
+
+//ブロックごとの指定カードの枚数座標リストの生成
+function makeConditionCoordinates(group, cards, cnums, num){
+  let groupnums = makeGroupNums(group, cards, cnums);
+  return makeCoordinates(sumArray(groupnums), num, groupnums);
+}
+
+//ブロックごとの条件[ID-枚数-モード]の生成
+function makeConditionBlock(group, mode, conCoor){
+  let gl = group.length;
+  let cclen = conCoor.length;
+  let rtn = [];
+  for (let i = 0; i < cclen; i = (i+1)){
+    let rtn0 = [];
+    for (let j = 0; j < gl; j = (j+1)){
+      let rtn1 = [];
+      rtn1.push(group[j]);
+      rtn1.push(conCoor[i][j]);
+      rtn1.push(mode);
+      rtn0.push(rtn1.slice());
     }
-    if (sumArray(group) <= deck && hand <= deck){
-      let multi = makeMultiHandPat(deck, hand, group, pt);
-      let condition = makecondition(group);
-      let result = chkMultiHandPat(multi, hand, group, condition);
-      let str0 = "計算結果："+String(Math.round(result/combination_pt(deck,hand,pt)*1000000)/10000)+"％\n";
-      if (Math.pow(2,53)-1 >= combination_pt(deck,hand,pt)){
-        str0 = str0 + "（" + result+"／"+combination_pt(deck,hand,pt)+"通り）";
-      }
-      document.querySelector("#output").innerText = str0;
-      let cl = condition.length;
-      for (let k = 0; k < cl; k++){
-        let scon = [];
-        scon.push(condition[k]);
-        document.querySelectorAll(".row_result")[k].innerText = String(Math.round(chkMultiHandPat(multi, hand, group, scon)/combination_pt(deck,hand,pt)*1000000)/10000)+"％";
-      }
-      condition_ex();
+    rtn.push(rtn0.slice());
+  }
+  return rtn;
+}
+
+//ブロックごとの条件を合成
+function makeConditionGroup(ary1, ary2){
+  if (ary1.length + ary2.length){
+    let rtn = [];
+    let sl = ary1.length;
+    let ll = ary2.length;
+    if (Math.min(ary1.length, ary2.length) === 0){
+      return [];
     }else{
-      let err = "";
-      if (hand > deck){
-        err = "エラー：手札枚数がデッキ枚数を超えています。\n";
+      for (let i = 0; i < sl; i = (i+1)){
+        for (let j = 0; j < ll; j = (j+1)){
+          rtn.push([].concat(ary1[i]).concat(ary2[j]));
+        }
       }
-      if (sumArray(group) > deck){
-        err = "エラー：登録カードの合計枚数がデッキ枚数を超えています。\n";
-      }
-      document.querySelector("#output").innerText = err;
+      return rtn;
     }
   }else{
-    let err = "";
-    if (!(rows_counter.length)){
-      err = "エラー：条件が登録されていません。\n";
-    }
-    if (!(cols_counter.length)){
-      err = "エラー：カードが登録されていません。\n";
-    }
-    document.querySelector("#output").innerText = err;
+    return [];
   }
 }
 
-function printDrawClear(){
-  let rows = rows_counter.length;
-  let cols = cols_counter.length;
-  for (let i = 0; i < rows; i++){
-    let obj = document.querySelector("#esc_table > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(1) > input");
-    deleteRow(obj,rows_counter[i]);
+/*条件配列の変換 consource : [[[[id, id, ...], num, mode], ...], ...]
+ * => conTemp : [[[id, num, mode], [id, num, mode], ...], ...]
+ * => condition : [[[min, max], [min, max], ...], ...]
+ */
+function makeCondition(cards, cnums, consource){
+  let rtn = [];
+  let conTemp = [];
+  for (let i=0, ilim = consource.length; i < ilim; i=(i+1)){
+    let conGroup = [];
+    let csBlock = consource[ i ];
+    let jlim = csBlock.length;
+    for (let j = 0; j < jlim; j = (j+1)){
+      let group = csBlock[j][0];
+      let num = csBlock[j][1];
+      let mode = csBlock[j][2];
+      let conCoor = makeConditionCoordinates(group, cards, cnums, num);
+      conGroup.push(makeConditionBlock(group, mode, conCoor));
+    }
+    let tmpary = conGroup[0];
+    for (let m = 1; m < jlim; m = (m+1)){
+      tmpary = makeConditionGroup(tmpary, conGroup[m]);
+    }
+    conTemp = conTemp.concat(tmpary.slice());
   }
-  for (let i = cols - 1; i >= 0; i--){
-    deleteColumn("esc_table",cols_counter[i]);
+  let cgl = conTemp.length;
+  let vari = cards.length;
+  let def = JSON.stringify(makeDefaultCondition(cnums, vari));
+  for (let i = 0; i < cgl; i = (i+1)){
+    let rt = JSON.parse(def);
+    let conil = conTemp[i].length
+    for (let j = 0; j < conil; j = (j+1)){
+      let c = conTemp[i][j];
+      let index = cards.indexOf(c[0]);
+      if (c[2] === 0){
+        rt[index][0] = rt[index][0] + c[1];
+      }else if (c[2] === 1){
+        if (rt[index][0] <= c[1] && rt[index][1] >= c[1]){
+          rt[index][0] = rt[index][0] + c[1];
+          rt[index][1] = c[1];
+        }else{
+          rt[index][1] = -1;
+        }
+      }else if (c[2] === 2){
+        rt[index][1] = rt[index][1] - c[1];
+      }else if (c[2] === 3){
+        if (rt[index][0] <= (cnums[index] - c[1]) && rt[index][1] >= (cnums[index] - c[1])){
+          rt[index][0] = rt[index][0] + cnums[index] - c[1];
+          rt[index][1] = cnums[index] - c[1];
+        }else{
+          rt[index][1] = -1;
+        }
+      }
+    }
+    rtn.push(rt.slice());
   }
-  insertRow('esc_table');
-  insertColumn('esc_table');
-  document.querySelector("#output").innerText = "条件を設定してください";
-  document.querySelector("#export_box").value = "";
+  //最適化
+  let rtnlen = rtn.length;
+  let minirtn = [];
+  if (rtn.length > 0){
+    for (let k = 0; k < rtnlen; k = (k+1)){
+      let rklen = rtn[k].length;
+      let chk = 1;
+      for (let m = 0; m < rklen; m = (m+1)){
+        if (rtn[k][m][0] > cnums[m] || rtn[k][m][1] < 0 || rtn[k][m][0] > rtn[k][m][1]){
+          chk = 0;
+        }
+      }
+      if (chk === 1){
+        minirtn.push(rtn[k]);
+      }
+    }
+  }
+  return minirtn.uniq();
 }
 
-function condition_ex(){
-  let rows = rows_counter.length;
-  let cols = cols_counter.length;
-  let src =  + document.querySelector("#deck_n").value
-  + "_$" + document.querySelector("#hand_n").value
-  + "_$" + String(rows)
-  + "_$" + String(cols) + "_$";
-  let cng = document.querySelectorAll(".cardnum");
-  let cnameg = document.querySelectorAll(".cardname");
-  for (let i = 0; i < cols; i++){
-    let c = "0";
-    if (cng[ i ].value.length){
-      c = cng[ i ].value;
+
+function addCard(){
+  let newcard = document.createElement("div");
+  let cid = String(1);
+  if (cards_counter.length){
+    cid = String(cards_counter[cards_counter.length - 1] + 1);
+  }
+  cards_counter.push(Number(cid));
+  newcard.setAttribute("id", "card"+cid);
+  newcard.setAttribute("cid", cid);
+  newcard.className = "card";
+  newcard.innerHTML = [
+    '<div class="delbutton" onclick="deleteCard(', cid, ')" title="カードを消去">',
+      '<div class="delmark">',
+        
+      '</div>',
+    '</div>',
+    '<div class="settingarea">',
+      '<span class="settinglabel">','カード名:','</span>',
+      '<input type="text" class="cardname" placeholder="カード名" size="20" value="カード', cid, '" onchange="updateOption(', cid, ')" cid="', cid, '">',
+      '<br class="settinglabel">',
+      '／','<span class="settinglabel">','投入枚数:','</span>',
+      '<input type="number" class="cardnum" size="15" placeholder="枚数" min="0" max="255" onclick="this.select();" cid="', cid, '">',
+      '枚',
+    '</div>'
+    ].join('');
+  let csbox = document.querySelector("#cardsetbox");
+  let addc = document.querySelector("#addcard");
+  csbox.insertBefore(newcard, addc);
+  let cls = document.querySelectorAll(".selectcondition");
+  let clsl = cls.length;
+  for (let i = 0; i < clsl; i=(i+1)){
+    let newoption = document.createElement("li");
+    newoption.setAttribute("checked","0");
+    newoption.setAttribute("onclick","selectmulti(this)");
+    newoption.setAttribute("value",cid);
+    newoption.innerText = "カード" + cid;
+    cls[i].querySelector(".selectbox").appendChild(newoption);
+  }
+  refselectmulti(cls);
+}
+
+function deleteCard(num){
+  let cid = String(num)
+  let deltarget = $cid(cid);
+  deltarget.parentNode.removeChild(deltarget);
+  cards_counter = cards_counter.filter(function(item,index){
+    if (item !== num) return true;
+  });
+  let vg = document.querySelectorAll(".selectcondition");
+  let vgl = vg.length;
+  for (let i = 0; i < vgl; i = (i+1)){
+    let deltarget = vg[i].querySelector('.selectbox > [value="' + cid + '"]');
+    deltarget.parentNode.removeChild(deltarget);
+  }
+  refselectmulti(vg);
+}
+
+function addCon(num){
+  let index = cg_index.indexOf(num);
+  let cgid = String(num)
+  if (index < 0){
+    return false;
+  }else{
+    let newcon = document.createElement("div");
+    let newandblock = document.createElement("div");
+    let conid = String(1);
+    if (con_counter[index].length){
+      conid = String(con_counter[index][con_counter[index].length - 1] + 1);
     }
-    src = src + "_$" + cnameg[ i ].value
-      + "_$" + c;
-  }
-  src = src + "_$";
-  let cong = document.querySelectorAll(".condition_n");
-  let comg = document.querySelectorAll(".condition_m");
-  for (let i = 0; i < cols * rows; i++){
-    let cn = "0";
-    if (cong[ i ].value.length){
-    cn = cong[ i ].value;
+    con_counter[index].push(Number(conid));
+    newcon.setAttribute("id", "con_" + cgid + "_" + conid);
+    newcon.setAttribute("conid", conid);
+    newcon.className = "condition";
+    let clist = ('');
+    for (let i = 0; i < cards_counter.length; i=(i+1)){
+      let ci = String(cards_counter[i]);
+      let cn = $cid(ci).querySelector('.cardname').value
+      clist = clist + '<li checked="0" onclick="selectmulti(this)" value="' + ci + '">' + cn + '</li>';
     }
-    src = src + "_$" + cn
-      + "_$" + comg[ i ].value;
+    newcon.innerHTML = [
+      '<div class="delbutton" onclick="deleteCon(', cgid, ',', conid, ')" title="条件を消去">',
+        '<div class="delmark">',
+          
+        '</div>',
+      '</div>',
+      '<div class="coninner">',
+        '<div class="selectcondition select">',
+          '<span class="selectmsg" msg="0" opened="0" onclick="menuopen(this); event.stopPropagation()">',
+            '<div class="defaultmsg">(未選択)</div>',
+            '<div class="singleselect"></div>',
+            '<div class="multiselect">(<span class="count">count</span>種類選択中)</div>',
+          '</span>',
+          '<ul class="selectbox" onclick="event.stopPropagation()">',
+          clist,
+          '</ul>',
+        '</div>',
+        '<div class="condition_mn">',
+          '<div class="setteingcon_n">',
+            '<span class="settinglabel">','／','</span>',
+            '<input type="number" class="condition_n" name="condition_n_', cgid, '_', conid, '" size="15" placeholder="枚数" min="0" max="255" onclick="this.select();">',
+            '枚',
+          '</div>',
+          '<div class="condition_m select">',
+            '<span class="selectmsg" msg="1" opened="0" onclick="menuopen(this)">',
+              '<div class="defaultmsg"></div>',
+              '<div class="singleselect">以上ドロー</div>',
+            '</span>',
+            '<ul class="selectbox">',
+              '<li class="menumsg" onclick="event.stopPropagation()">▼▼ モード ▼▼</li>',
+              '<li selected="1" value="0" onclick="selectsingle(this)">以上ドロー</li>',
+              '<li selected="0" value="1" onclick="selectsingle(this)">ちょうどドロー</li>',
+              '<li selected="0" value="2" onclick="selectsingle(this)">以上デッキに残す</li>',
+              '<li selected="0" value="3" onclick="selectsingle(this)">ちょうどデッキに残す</li>',
+            '</ul>',
+          '</div>',
+        '</div>',
+      '</div>'
+      ].join('');
+    newandblock.setAttribute("conid", conid);
+    newandblock.className = "andblock";
+    /** newandblock.inner */
+    let newandmark = document.createElement("span");
+    newandmark.className = "andmark";
+    newandmark.innerHTML = "";
+    newandblock.appendChild(newandmark);
+    /** */
+    let inner = $cgid(cgid).querySelector(".congroupinner");
+    inner.appendChild(newcon);
+    inner.appendChild(newandblock);
   }
-  let dst = "x=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(src)));
-  let res = document.querySelector("#output").innerText;
-  let rsg = document.querySelectorAll(".row_result");
-  for (let i = 0; i < rows; i++){
-    res = res + "_$" + rsg[ i ].innerText;
+}
+
+function deleteCon(cgid, conid){
+  let cgindex = cg_index.indexOf(cgid);
+  let conindex = con_counter[cgindex].indexOf(conid);
+  if (con_counter[cgindex].length > 1){
+    let targetcon = $con(cgid, conid);
+    let targetaddblock = $conand(cgid, conid);
+    targetcon.parentNode.removeChild(targetcon);
+    targetaddblock.parentNode.removeChild(targetaddblock);
+    con_counter[cgindex] = con_counter[cgindex].filter(function(item,index){
+      if (item !== conid) return true;
+    });
+  }else{
+    let targetcongroup = $cgid(cgid);
+    targetcongroup.parentNode.removeChild(targetcongroup);
+    con_counter = con_counter.filter(function(item,index){
+      if (index !== cgindex) return true;
+    });
+    cg_index = cg_index.filter(function(item,index){
+      if (item !== cgid) return true;
+    });
   }
-  let rdst = "y=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(res)))
-  let url = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + dst + "&" + rdst;
+}
+
+function addConGroup(){
+  let newcongroup = document.createElement("div");
+  let cgid = String(1);
+  if (cg_index.length){
+    cgid = String(cg_index[cg_index.length - 1] + 1);
+  }
+  cg_index.push(Number(cgid));
+  con_counter.push([]);
+  newcongroup.setAttribute("id", "congroup"+cgid);
+  newcongroup.setAttribute("cgid", cgid);
+  newcongroup.className = "congroup";
+  newcongroup.innerHTML = [
+    '<div class="congroupinner">',
+      '<div id="conbase', cgid, '" class="conbase">',
+        '<div class="coninner">',
+          '<div class="contxt">',
+            'パターン', cgid, '：',
+          '</div>',
+          '<div class="output">',
+            '条件を設定してください。',
+          '</div>',
+        '</div>',
+      '</div>',
+      '<div class="conblock">',
+        '<span class="conmark"><span>',
+      '</div>',
+    '</div>',
+    '<div class="addconwrap">',
+      '<div class="addcon" onclick="addCon(', cgid, ')" title="条件を追加">',
+        '<span class="andconmark"><span>',
+      '</div>',
+    '</div>'
+  ].join("");
+  let csbox = document.querySelector("#consetbox");
+  let acg = document.querySelector("#addcongroup");
+  csbox.insertBefore(newcongroup, acg);
+  addCon(Number(cgid));
+}
+
+function updateOption(num){
+  let n = $cid(num).querySelector('.cardname').value;
+  let cid = String(num);
+  let cls = document.querySelectorAll(".selectcondition");
+  let clsl = cls.length;
+  for (let i = 0; i < clsl; i = (i+1)){
+    cls[i].querySelector('.selectbox > [value="' + cid + '"]').innerText = n;
+  }
+  refselectmulti(cls);
+}
+
+function selectsingle(e){
+  let name = e.innerText;
+  let list = e.parentNode;
+  let menu = list.parentNode;
+  let selectmsg = menu.querySelector('.selectmsg');
+  let msg = selectmsg.querySelector('.singleselect');
+  let selected = list.querySelectorAll('[selected="1"]');
+  for (let i = 0, len = selected.length; i < len; i = (i+1)){
+    selected[i].setAttribute("selected", "0");
+  }
+  e.setAttribute("selected", "1");
+  selectmsg.setAttribute("msg","1");
+  msg.innerText = name;
+}
+
+function selectmulti(e){
+  if (e.getAttribute("checked") === "0"){
+    e.setAttribute("checked", "1");
+  }else{
+    e.setAttribute("checked", "0");
+  }
+  let list = e.parentNode;
+  let menu = list.parentNode;
+  let selectmsg = menu.querySelector('.selectmsg');
+  let checked = list.querySelectorAll('[checked="1"]');
+  let n = checked.length;
+  if (n === 0){
+    selectmsg.setAttribute("msg","0");
+  }else if (n === 1){
+    selectmsg.setAttribute("msg","1");
+    let name = checked[0].innerText;
+    let msg = selectmsg.querySelector('.singleselect');
+    msg.innerText = name;
+  }else{
+    selectmsg.setAttribute("msg","2");
+    let count = selectmsg.querySelector('.multiselect > .count');
+    count.innerText = String(n);
+  }
+}
+
+function refselectmulti(selects){
+  let len = selects.length;
+  for (i = 0; i < len; i = (i+1)){
+    let menu = selects[i];
+    let selectmsg = menu.querySelector('.selectmsg');
+    let list = menu.querySelector('.selectbox')
+    let checked = list.querySelectorAll('[checked="1"]');
+    let n = checked.length;
+    if (n === 0){
+      selectmsg.setAttribute("msg","0");
+    }else if (n === 1){
+      selectmsg.setAttribute("msg","1");
+      let name = checked[0].innerText;
+      let msg = selectmsg.querySelector('.singleselect');
+      msg.innerText = name;
+    }else{
+      selectmsg.setAttribute("msg","2");
+      let count = selectmsg.querySelector('.multiselect > .count');
+      count.innerText = String(n);
+    }
+  }
+}
+
+function menuopen(e){
+  if (e.getAttribute("opened") === "0"){
+    menuclose();
+    e.setAttribute("opened", "1");
+  }else{
+    e.setAttribute("opened", "0");
+  }
+  event.stopPropagation();
+}
+function menuclose() {
+  let te = document.querySelectorAll('[opened="1"].selectmsg');
+  for (let i = 0, elen = te.length; i < elen; i = (i+1)){
+    te[i].setAttribute("opened","0");
+  }
+}
+
+function drawCalc(){
+  console.time('drawCalc');
+  let deck = Number(document.getElementById('deck_n').value);
+  let hand = Number(document.getElementById('hand_n').value);
+  if (256 > deck && deck >= hand && hand >= 0){
+    let cards = cards_counter;
+    let cs = document.querySelectorAll('.card');
+    let cnums = [];
+    for (let i = 0, cardslen = cs.length; i < cardslen; i = (i+1)){
+      cnums.push(Number(cs[i].querySelector('.cardnum').value));
+    }
+    if (deck >= sumArray(cnums)){
+      let consource = [];
+      let _cards = [];
+      let cg = document.querySelectorAll('.congroup');
+      for (let j = 0, cglen = cg.length; j < cglen; j = (j+1)){
+        consource[j] = [];
+        let cgid = cg_index[j];
+        let conids = con_counter[j];
+        let conlen = conids.length;
+        for (k = 0; k < conlen; k = (k+1)){
+          consource[j][k] = [];
+          let conid = conids[k];
+          let ary = [];
+          let con = $con(cgid, conid);
+          let cc = con.querySelectorAll('[checked="1"]');
+          for (l=0,cclen=cc.length; l<cclen; l=(l+1)){
+            ary.push(Number(cc[l].getAttribute('value')));
+          }
+          _cards = _cards.concat(ary.slice());
+          consource[j][k].push(ary.slice());
+          consource[j][k].push(Number(con.querySelector('.condition_n').value));
+          consource[j][k].push(Number(con.querySelector('.condition_m').querySelector('[selected="1"]').getAttribute("value")));
+        }
+      }
+      _cards = _cards.uniq().sort(function(a, b){return a - b;});
+      let _cnums = makeGroupNums(_cards, cards, cnums);
+      let condition = makeCondition(_cards, _cnums, consource.slice());
+      if (condition.length > 0){
+        let pt = pascal_triangle(deck);
+        let drawpat = makeDrawPattern(deck, hand, _cnums, pt);
+        let coordinates = makeCoordinates(deck, hand, _cnums);
+        let result = calcResult(drawpat, hand, _cnums, condition, coordinates);
+        let str0 = "計算結果："+String(Math.round(result/combination_pt(deck,hand,pt)*1000000)/10000)+"％\n";
+        if (Math.pow(2,53) - 1 >= combination_pt(deck,hand,pt)){
+          str0 = str0 + "（" + result.toLocaleString()+" ／ "+combination_pt(deck,hand,pt).toLocaleString()+"通り）";
+        }
+        document.querySelector('#top_output > .output').innerText = str0;
+        let cl = consource.length;
+        let rows = document.querySelectorAll(".congroup");
+        for (let m = 0; m < cl; m=(m+1)){
+          let scon = [];
+          scon.push(consource[m]);
+          let mscon = makeCondition(_cards, _cnums, scon);
+          if (mscon.length > 0){
+            let r1 = 0;
+            if (JSON.stringify(condition) === JSON.stringify(mscon)){
+              r1 = result;
+            }else{
+              r1 = calcResult(drawpat, hand, _cnums, mscon, coordinates);
+            }
+            let str1 = "個別計算結果："+String(Math.round(r1/combination_pt(deck,hand,pt)*1000000)/10000)+"％\n";
+            if (Math.pow(2,53)-1 >= combination_pt(deck,hand,pt)){
+              str1 = str1 + "（" + r1.toLocaleString() +" ／ "+combination_pt(deck,hand,pt).toLocaleString()+"通り）";
+            }
+            rows[m].querySelector('.output').innerText = str1;
+          }else{
+            rows[m].querySelector('.output').innerText = '設定された条件は有効ではありません。';
+          }
+        }
+      }else{
+        document.querySelector('#top_output > .output').innerText = 'エラー:\n有効な条件が設定されていません。';
+        let rows = document.querySelectorAll(".congroup");
+        for (m = 0, rlen = rows.length; m < rlen; m=(m+1)){
+          rows[m].querySelector('.output').innerText = '設定された条件は有効ではありません。';
+        }
+      }
+      condition_ex(deck, hand, cards, cnums, consource);
+    }else{
+      document.querySelector('#top_output > .output').innerText = 'エラー:\n設定したカードの合計枚数が、デッキ枚数を超えています。';
+      let rows = document.querySelectorAll(".congroup");
+      for (m = 0, rlen = rows.length; m < rlen; m=(m+1)){
+        rows[m].querySelector('.output').innerText = '';
+      }
+    }
+  }else{
+    if (deck < hand){
+      document.querySelector('#top_output > .output').innerText = 'エラー:\n手札の枚数がデッキ枚数を超えています。';
+    }else{
+      document.querySelector('#top_output > .output').innerText = 'エラー:\nデッキまたは手札の枚数は0～255枚の範囲で設定してください。';
+    }
+    let rows = document.querySelectorAll(".congroup");
+    for (m = 0, rlen = rows.length; m < rlen; m=(m+1)){
+      rows[m].querySelector('.output').innerText = '';
+    }
+  }
+  console.timeEnd('drawCalc');
+}
+
+function condition_ex(deck, hand, cards, cnums, consource){
+  let cnames = [];
+  let cng = document.querySelectorAll(".cardname");
+  for (let i = 0, cl = cng.length; i < cl; i = (i+1)){
+    cnames.push(cng[i].value);
+  }
+  let str = "xj=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(JSON.stringify([deck, hand, cards, cnames, cnums, consource]))));
+  let url = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + str;
   document.querySelector("#export_box").value = url;
-  document.querySelector("#tweet-area").children[0].remove();
-  twttr.widgets.createShareButton(url, document.getElementById('tweet-area'), { text: "ドロー確率計算機 (Beta)\n確率"+document.querySelector("#output").innerText+"でした！\n詳細は->" });
+  if (document.querySelector("#tweet-area").children.length > 0){
+    document.querySelector("#tweet-area").innerHTML="";
+  }
+  /*IEはTwitterのサポートが終了したので分岐*/
+  if (typeof twttr !== 'undefined'){
+    twttr.widgets.createShareButton(url, document.getElementById('tweet-area'), { text: "ドロー確率計算機\n確率"+document.querySelector("#top_output > .output").innerText+"でした！\n詳細は->" });
+  }
 }
 
 function condition_in(){
-  let dst = Base64.btou(RawDeflate.inflate(Base64.fromBase64(queryParam.x)));
-  let c = dst.split("_$_$");
-  c[0]=c[0].split("_$");
-  c[1]=c[1].split("_$");
-  c[2]=c[2].split("_$");
-  document.querySelector("#deck_n").value = c[0][0];
-  document.querySelector("#hand_n").value = c[0][1];
-  for (let r = 0; r < c[0][2]; r++){
-    insertRow('esc_table');
-  }
-  for (let i = 0; i < c[0][3]; i++){
-    insertColumn('esc_table');
-  }
-  for (let i = 0; i < c[0][3]; i++){
-    document.querySelectorAll(".cardname")[ i ].value = c[1][ 2*i ];
-    document.querySelectorAll(".cardnum")[ i ].value = c[1][ 2*i + 1 ];
-  }
-  for (let i = 0; i < c[0][2] * c[0][3]; i++){
-    document.querySelectorAll(".condition_n")[ i ].value = c[2][ 2*i ];
-    document.querySelectorAll(".condition_m")[ i ].value = c[2][ 2*i + 1 ];
-  }
-  if (queryParam.y && queryParam.y.length){
-    let rdst = Base64.btou(RawDeflate.inflate(Base64.fromBase64(queryParam.y)));
-    let d = rdst.split("_$");
-    document.querySelector("#output").innerText = d[0];
-    for (let i = 0; i < rows_counter.length; i++){
-      document.querySelectorAll(".row_result")[ i ].innerText = d[ i + 1 ];
+  if (queryParam.xj || queryParam.x){
+    let str = '';
+    if (queryParam.xj){
+      str = Base64.btou(RawDeflate.inflate(Base64.fromBase64(queryParam.xj)));
+    }else{
+      str = convertConditionInBeta(queryParam.x);
     }
-    let url = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?x=" + queryParam.x + "&y=" + queryParam.y;
-    document.querySelector("#export_box").value = url;
-    document.querySelector("#tweet-area").children[0].remove();
-    twttr.widgets.createShareButton(url, document.getElementById('tweet-area'), { text: "ドロー確率計算機 (Beta)\n確率"+d[0]+"でした！\n詳細は->" });
+    try {
+      JSON.parse(str);
+    } catch(e){
+      condition_st();
+      return false;
+    }
+    dst = JSON.parse(str);
+    if (dst.length === 6){
+      document.getElementById('deck_n').value = dst[0];
+      document.getElementById('hand_n').value = dst[1];
+      let cards = dst[2];
+      let cs = cards.length;
+      for (let i = 0; i < cs; i = (i+1)){
+        addCard();
+      }
+      let cg = document.querySelectorAll(".card");
+      for (let i = 0; i < cs; i = (i+1)){
+        cg[i].querySelector(".cardname").value = dst[3][i];
+        cg[i].querySelector(".cardnum").value = dst[4][i];      
+      }
+      for (let j = 0; j < dst[5].length; j = (j+1)){
+        addConGroup();
+        for (let k = 1; k < dst[5][j].length; k = (k+1)){
+          addCon(j+1);
+        }
+      }
+      for (let j = 0; j < dst[5].length; j = (j+1)){
+        for (let k = 0; k < dst[5][j].length; k = (k+1)){
+          let tcon = $con(j + 1, k + 1);
+          tcon.querySelector(".condition_n").value = dst[5][j][k][1];
+          selectsingle(tcon.querySelector('.condition_m > .selectbox > [value="' + String(dst[5][j][k][2]) + '"]'))
+          for (let s = 0; s < dst[5][j][k][0].length; s = (s+1)){
+            selectmulti(tcon.querySelector('.selectcondition > .selectbox > [value="'+(String(cards.indexOf(dst[5][j][k][0][s]) + 1))+'"]'));
+          }
+        }
+      }
+      drawCalc();
+    }else{
+      condition_st();
+    }
   }else{
-    printDrawCalc();
+    condition_st();
   }
 }
 
-function insertRow(id) {
-  let table = document.getElementById(id);
-  let cell_len = table.rows[0].cells.length;
-  let row = table.insertRow(-1);
-  let cell0 = row.insertCell(-1);
-  let r = 1;
-  if (rows_counter.length > 0){
-    r = rows_counter[rows_counter.length - 1] + 1;
+function condition_st(){
+  addCard();
+  addConGroup();
+  if (document.querySelector("#tweet-area").children.length > 0){
+    document.querySelector("#tweet-area").innerHTML="";
   }
-  rows_counter.push(r);
-  cell0.className = "fixed02";
-  let button = '<input type="button" value="条件削除" onclick="deleteRow(this,'+r+')" /><br>条件'+String(r)+'：<span class="row_result"></span>';
-  cell0.innerHTML = button;
-  for (let i = 1 ; i < cell_len; i++){
-    let cell = row.insertCell(-1);
-    cell.innerHTML = '<input type="number" class="condition_n" name="condition_n_'
-      + String(r) + '_' + String(cols_counter[i - 1]) + '" size="15" placeholder="枚数" min="0" max="255" onclick="this.select();">枚<br><select class="condition_m" name="condition_m_'
-      + String(r) + '_' + String(cols_counter[i - 1]) + '" size="1"><option disabled selected value>▼▼ モード ▼▼</option><option selected value="0">以上ドロー</option><option value="1">ちょうどドロー</option><option value="2">以上デッキに残す</option><option value="3">ちょうどデッキに残す</option></select>';
+  if (typeof twttr !== 'undefined'){
+    twttr.widgets.createShareButton(location.href.replace(/\#.*$/, '').replace(/\?.*$/, ''),
+      document.getElementById('tweet-area'),
+      {
+        text: "ドロー確率計算機\n"
+      }
+    );
   }
 }
 
-function deleteRow(obj,r){
-  tr = obj.parentNode.parentNode;
-  tr.parentNode.deleteRow(tr.sectionRowIndex);
-  rows_counter.splice(rows_counter.indexOf(r),1);
-}
-
-function insertColumn(id){
-  let table = document.getElementById(id);
-  let rows = table.rows.length;
-  let cell = table.rows[0].insertCell(-1);
-  let cols = table.rows[0].cells.length;
-  let c = 1;
-  if (cols_counter.length > 0){
-    c = cols_counter[cols_counter.length - 1] + 1;
-  }
-  cols_counter.push(c);
-  cell.className = "fixed02";
-  cell.innerHTML = '<input type="button" value="カード削除" onclick="deleteColumn(\'esc_table\','+String(c)+')">';
-  cell = table.rows[1].insertCell(-1);
-  cell.className = "fixed02";
-  cols = table.rows[1].cells.length;
-  cell.innerHTML = '<input type="text" class="cardname" name="name_'+String(c)+'" placeholder="カード名"　size="20" value="カード'+String(c)+'"><br><label>／<input type="number" name="group_'+String(c)+'" class="cardnum" size="15" placeholder="投入枚数" min="0" max="255" onclick="this.select();">枚</label>'
-  for (let i = 2; i < rows; i++){
-    cell = table.rows[i].insertCell(-1);
-    cols = table.rows[i].cells.length;
-    cell.innerHTML = '<input type="number" class="condition_n" name="condition_n_'
-      + String(rows_counter[i - 2]) + '_' + String(c) + '" size="15" placeholder="枚数" min="0" max="255" onclick="this.select();">枚<br><select class="condition_m" name="condition_m_'
-      + String(rows_counter[i - 2]) + '_' + String(c) + '" size="1"><option disabled selected value>▼▼ モード ▼▼</option><option selected value="0">以上ドロー</option><option value="1">ちょうどドロー</option><option value="2">以上デッキに残す</option><option value="3">ちょうどデッキに残す</option></select>';
-  }
-}
-
-function deleteColumn(id,n){
-  let table = document.getElementById(id);
-  let rows = table.rows.length;
-  let tc = cols_counter.indexOf(n) + 1;
-  for (let i = 0; i < rows; i++){
-    let cols = table.rows[i].cells.length;
-    table.rows[i].deleteCell(tc);
-  }
-  cols_counter.splice(cols_counter.indexOf(n),1);
-}
-
-function copyToClipboard(id){
-  let copyTarget = document.querySelector(id);
+function copyToClipboard(target){
+  let copyTarget = document.querySelector(target);
   copyTarget.select();
   document.execCommand("Copy");
+}
+
+// ページ上部にスクロール
+function scrolltop(){
+  scrollTo(0, 0);
+}
+
+//旧バージョンとの互換用
+function convertConditionInBeta(x){
+  let dst = Base64.btou(RawDeflate.inflate(Base64.fromBase64(x)));
+  let c = dst.split("_$_$");
+  c[0] = c[0].split("_$");
+  c[1] = c[1].split("_$");
+  c[2] = c[2].split("_$");
+  
+  let deck = Number(c[0][0]);
+  let hand = Number(c[0][1]);
+  let cards = [];
+  for (let i = 1, len = Number(c[0][3]); i <= len; i = (i+1)){
+    cards.push(i);
+  }
+  let cnames = [];
+  let cnums = [];
+  for (let j = 0, len = c[1].length/2; j < len; j = (j+1)){
+    cnames.push(c[1][j*2]);
+    cnums.push(Number(c[1][j*2+1]));
+  }
+  let consource = [];
+  for (let s = 0, slen = Number(c[0][2]); s < slen; s = (s+1)){
+    let conGroup = [];
+    for(t = 0, tlen = c[1].length/2; t < tlen; t = (t+1)){
+      if (!(c[2][s*tlen*2+t*2]==="0" && c[2][s*tlen*2+t*2+1]==="0")){
+        let num = Number(c[2][s*tlen*2+t*2]);
+        let mode = Number(c[2][s*tlen*2+t*2+1]);
+        conGroup.push([[t+1], num, mode].slice());
+      }
+    }
+    consource.push(conGroup.slice())
+  }
+  let rtn = JSON.stringify([deck, hand, cards, cnames, cnums, consource]);
+  return rtn;
 }

@@ -1,0 +1,6 @@
+@charset "utf-8";
+
+footer, footer > * {
+  font-size: small;
+  text-align: center;
+}
