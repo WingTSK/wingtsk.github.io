@@ -47,14 +47,29 @@ label{
   width: 100%;
   height: 100%;
 }
+#deckhandset, #top_result, #top_calc, .card, #addcard {
+  background: #eee;
+  width: 15.5em;
+  height: 9.125em;
+  padding: 0.25em;
+  border: 2px solid #64d8cc;
+  border-radius: 0.9375em;
+  margin: 0.25em;
+  display: flex;
+  flex-direction: column;
+}
+#deckhandset > * {
+  margin: 0.625em;
+}
+#mainset {
+  display: flex;
+  margin: 0.125em;
+  flex-wrap: wrap-reverse;
+}
+
 #top_calc:hover {
   background: #b1ebe5;
   cursor: pointer;
-  background: url(../../img/cell-bg-havor.png);
-  background-size: contain;
-}
-#top_calc:hover>.drawcalculator{
-  /*background: #5ac2b7;*/
 }
 #bottom_calc {
   display: none;
@@ -139,31 +154,14 @@ label{
   user-select: none;
 }
 
-.card, #addcard {
-  background: #eee;
-  width: 15.5em;
-  height: 9.125em;
-  padding: 0.25em;
-  border: 2px solid #64d8cc;
-  border-radius: 0.9375em;
-  margin: 0.25em;
-  display: flex;
-  background: url(../../img/cell-bg.png);
-  background-size: contain;
-}
 #addcard:hover, #addcongroup:hover {
   background: #b1ebe5;
   cursor: pointer;
-  background: url(../../img/cell-bg-havor.png);
-  background-size: contain;
 }
 #addcard:hover>.addbtn #addcongroup:hover>.addbtn {
   background: #5ac2b7;
 }
 
-.card{
-  flex-direction: column;
-}
 .card > label, .condition > label {
   position: relative;
   margin-top: 0.75em;
@@ -194,8 +192,6 @@ label{
   border-radius: 0.9375em;
   margin: 0.25em;
   display: flex;
-  background: url(../../img/cell-bg.png);
-  background-size: contain;
   margin-right: 0;
 }
 .congroup {
@@ -222,8 +218,6 @@ label{
   width: 13.5em;
   display: flex;
   flex-direction: column;
-  background: url(../../img/cell-bg.png);
-  background-size: contain;
   border-top-left-radius: 0.9375em;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
@@ -233,8 +227,6 @@ label{
   width: 14.25em;
   display: flex;
   flex-direction: column;
-  background: url(../../img/cell-bg.png);
-  background-size: contain;
 }
 .coninner {
   width: inherit;
@@ -342,8 +334,6 @@ label{
   line-height: 11.25em;
   text-align: center;
   text-decoration: none;
-  background: url(../../img/block-bg.png);
-  background-size: contain;
 }
 .conmark {
   width: 100%;
@@ -366,8 +356,6 @@ label{
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  background: url(../../img/block-bg.png);
-  background-size: contain;
 }
 .andmark {
   width: 100%;
@@ -494,53 +482,6 @@ footer, footer > * {
   font-size: 1.25em;
 }
 
-#deckhandset {
-  background: #eee;
-  width: 15.5em;
-  height: 9.125em;
-  padding: 0.25em;
-  border: 2px solid #64d8cc;
-  border-radius: 0.9375em;
-  margin: 0.25em;
-  display: flex;
-  flex-direction: column;
-  background: url(../../img/cell-bg.png);
-  background-size: contain;
-}
-#deckhandset > * {
-  margin: 0.625em;
-}
-#mainset {
-  display: flex;
-  margin: 0.125em;
-  flex-wrap: wrap-reverse;
-}
-#top_result {
-  background: #eee;
-  width: 15.5em;
-  height: 9.125em;
-  padding: 0.25em;
-  border: 2px solid #64d8cc;
-  border-radius: 0.9375em;
-  margin: 0.25em;
-  display: flex;
-  flex-direction: column;
-  background: url(../../img/cell-bg.png);
-  background-size: contain;
-}
-#top_calc{
-  background: #eee;
-  width: 15.5em;
-  height: 9.125em;
-  padding: 0.25em;
-  border: 2px solid #64d8cc;
-  border-radius: 0.9375em;
-  margin: 0.25em;
-  display: flex;
-  flex-direction: column;
-  background: url(../../img/cell-bg.png);
-  background-size: contain;
-}
 #result_buttons {
   display: flex;
   margin: 0.25em;
@@ -578,6 +519,20 @@ footer, footer > * {
   display: flex;
   flex-wrap: wrap;
 }
+/*グラデーション*/
+#deckhandset, #top_result, #top_calc, .card, #addcard, #addcongroup, .conbase, .condition {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABACAYAAADbER1AAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAACNJREFUGJVj+P///3+m////MzAxMDAw4GYRoYR01uA0ihRDAfoDahVef0dVAAAAAElFTkSuQmCC");
+  background-size: contain;
+}
+#top_calc:hover, #addcard:hover, #addcongroup:hover {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABACAYAAADbER1AAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAEpJREFUGJWVj8ENgDAMxKzbf6muw4cRzAOUFlEq9XlOonNo52EEIhKFcMdiQLAzCDXQCet7TlgVPfHd9mswtPm9ddtgaT/+uzC4AGcJTc6MUuQnAAAAAElFTkSuQmCC");
+  background-size: contain;
+}
+.conblock, .andblock {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABACAYAAADbER1AAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAACNJREFUGJVjuHv37n+m////MzAxMDAw4GYRoYR01uA0ihRDAXtPaa//8Mi6AAAAAElFTkSuQmCC");
+  background-size: contain;
+}
+
 
 @media screen and (max-width: 768px){
   body {
@@ -748,7 +703,7 @@ footer, footer > * {
   .condition_m {
     width: calc(100% - 1em);
   }
-  #addcongroup {
+ #addcongroup {
     width: auto;
     height: 6em;
   }

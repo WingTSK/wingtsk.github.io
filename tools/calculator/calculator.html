@@ -4,16 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale1.0,user-scalable=no">
   <title>ドロー確率計算機｜WingTSK's Project</title>
+  <link rel="stylesheet" type="text/css" href="./draw-calculator.css?20200709">
+  
   <link rel="icon" href="https://wingtsk.github.io/favicon.ico">
-  <link rel="stylesheet" type="text/css" href="./draw-calculator.css">
+  <link rel="apple-touch-icon" href="https://wingtsk.github.io/tools/calculator/img/draw-calculator.png">
+  
+  <!--OGP Start-->
+  <meta property="og:title" content="ドロー確率計算機｜WingTSK's Project">
+  <meta property="og:description" content="カードゲームで特定のカードや組み合わせをドローできる確率を計算できます。条件が複数ある場合にも対応しています。">
+  <meta property="og:image" content="https://wingtsk.github.io/tools/calculator/img/draw-calculator-ogp.png">
+  <!--OGP End-->
+  
+  <!--Twitter Card Start-->
   <meta name="twitter:card" content="summary">
   <meta name="twitter:site" content="@WingTSK">
   <meta name="twitter:title" content="ドロー確率計算機｜WingTSK's Project">
-  <meta name="twitter:description" content="遊戯王OCGなどの、カードゲームで特定のカードや組み合わせをドローできる確率を計算できます。条件が複数ある場合にも対応しています。">
-  <meta name="twitter:image" content="https://wingtsk.github.io/img/draw-calculator.png">
+  <meta name="twitter:description" content="カードゲームで特定のカードや組み合わせをドローできる確率を計算できます。条件が複数ある場合にも対応しています。">
+  <meta name="twitter:image" content="https://wingtsk.github.io/tools/calculator/img/draw-calculator.png">
+  <!--Twitter Card End-->
 </head>
 <body onclick="menuclose()">
-  <script type="text/javascript" src="./draw-calculator.js"></script>
+  <script type="text/javascript" src="./draw-calculator.js?var=0.1.1"></script>
   <script type="text/javascript" src="../../external/js/rawdeflate.js"></script>
   <script type="text/javascript" src="../../external/js/rawinflate.js"></script>
   <script type="text/javascript" src="../../external/js/base64.js"></script>
@@ -22,7 +33,7 @@
     <a href="https://wingtsk.github.io/">トップ</a>
     <h1><a href="./calculator.html">ドロー確率計算機</a></h1>
     <p>遊戯王OCGなどの、カードゲームで特定のカードや組み合わせをドローできる確率を計算できます。<br>条件が複数ある場合にも対応しています。</p>
-    <form name="calculator" autocomplete="off">
+    <form name="calculator" autocomplete="on">
     <div id="calc">
       <div id="mainset">
         <div id="deckhandset">
@@ -80,7 +91,7 @@
     <div class="chkmenu">
       <input type="checkbox" class="checkbox" id="checkbox1" style="display: none;"><label for="checkbox1"><span class="chkarrow">▼</span> 使い方（クリックで<span class="chktxt">表示</span>）</label>
       <div class="chkcontent" id="chkcontent1">
-      「基本設定：」では、デッキ（山札）の枚数と、引いている手札の枚数を設定できます。<br>
+      「基本設定：」では、デッキ（山札）の枚数と、引いている手札の枚数を設定します。<br>
       例えば、「40枚のデッキから5枚引く場合」の確率を計算したい場合は、「デッキ枚数：」に「40」、「手札枚数：」に「5」を、それぞれ入力してください。<br><br>
       「カード枚数設定:」では、カード名と、そのカードをデッキに投入している枚数を設定します。<br>
       設定するカードを増やす場合は、「カード枚数設定:」の一番最後の「＋」ボタンを押すことで、入力欄を増やすことができます。<br>
@@ -132,9 +143,10 @@
       （×：「カード１」を１枚ドローするパターン）<br>
       例５：の場合、２つの条件を合わせると"２枚ちょうどドロー"となりそうですが、それぞれで設定した"１枚ちょうどドロー"を満たすことができなくなるため、このような結果となります。）<br>
       </div>
-      <p>※このドロー確率計算機はjavascriptを使用しています。有効になっていない場合は動作しません。
-      <br>※過度に複雑な条件を設定した場合、計算に時間がかかったり、フリーズする場合があります。
-      <br>※このドロー確率計算機を使用したことにより生じた、いかなる損害に対しても、作者は責任を負わないものとします。
+      <p>※このドロー確率計算機を使用したことにより生じた、いかなる損害に対しても、作者は責任を負わないものとします。
+      <br>※このドロー確率計算機はjavascriptを使用しています。有効になっていない場合は動作しません。
+      <br>※お使いの端末・環境によって計算にかかる時間は異なります。
+      <br>※初手計算の範囲を大幅に超えるような、複雑な条件を設定した場合、計算に時間がかかる場合や、フリーズする場合があります。
       </p>
     </div>
     <div id="bottom_calc" class="drawcalculator" onclick="scrolltop();drawCalc()" title="計算！"><div></div></div>
@@ -145,8 +157,5 @@
     </nav>
     &copy;2020 WingTSK
   </footer>
-  <script>
-    condition_in();
-  </script>
 </body>
 </html>

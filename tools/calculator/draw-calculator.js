@@ -1,6 +1,6 @@
 /**
 draw-calculator.js
-version 0.1.0
+version 0.1.1
 Copyright (c) 2020 WingTSK
 */
   let cards_counter = [];
@@ -836,3 +836,7 @@ function convertConditionInBeta(x){
   let rtn = JSON.stringify([deck, hand, cards, cnames, cnums, consource]);
   return rtn;
 }
+
+
+//イベントハンドラ
+window.addEventListener('load', condition_in);
