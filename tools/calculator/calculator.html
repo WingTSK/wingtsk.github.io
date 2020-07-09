@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale1.0,user-scalable=no">
   <title>ドロー確率計算機｜WingTSK's Project</title>
-  <link rel="stylesheet" type="text/css" href="./draw-calculator.css?20200709">
+  <link rel="stylesheet" type="text/css" href="./draw-calculator.css?20200710">
   
   <link rel="icon" href="https://wingtsk.github.io/favicon.ico">
   <link rel="apple-touch-icon" href="https://wingtsk.github.io/tools/calculator/img/draw-calculator.png">
@@ -24,7 +24,7 @@
   <!--Twitter Card End-->
 </head>
 <body onclick="menuclose()">
-  <script type="text/javascript" src="./draw-calculator.js?var=0.1.1"></script>
+  <script type="text/javascript" src="./draw-calculator.js?var=0.2.0"></script>
   <script type="text/javascript" src="../../external/js/rawdeflate.js"></script>
   <script type="text/javascript" src="../../external/js/rawinflate.js"></script>
   <script type="text/javascript" src="../../external/js/base64.js"></script>
@@ -106,12 +106,19 @@
       <input type="checkbox" class="checkbox" id="checkbox2" style="display: none;"><label for="checkbox2"><span class="chkarrow">▼</span> 条件の設定方法（クリックで<span class="chktxt">表示</span>）</label>
       <div class="chkcontent" id="chkcontent2">
       ●モードの設定<br>
-      モードは、<br>
-      ・（設定枚数）以上ドロー<br>
-      ・（設定枚数）ちょうどドロー<br>
-      ・（設定枚数）以上デッキに残す<br>
-      ・（設定枚数）ちょうどデッキに残す<br>
-      これらの４種類があります。確率計算したい状況に合わせたモードを選んでください。<br><br>
+      条件モードは、<br>
+      ・（枚）以上ドロー<br>
+      ・（枚）ちょうどドロー<br>
+      ・（枚）以上デッキに残す<br>
+      ・（枚）ちょうどデッキに残す<br>
+      ・（種類）以上ドロー<br>
+      ・（種類）ちょうどドロー<br>
+      ・（種類）以上デッキに残す<br>
+      ・（種類）ちょうどデッキに残す<br>
+      これらの８種類から設定できます。確率を計算したい状況に合わせたモードを選んでください。<br><br>
+      ●「種類」モード<br>
+      ・「種類」モードでは、チェックを入れたカードの中から、指定の種類ドローしているかどうかで確率を計算します。<br>
+      ドローしている／していない（デッキに残っている／残っていない）で判定しているため、枚数の指定はできません。<br><br>
       ●より複雑な条件を設定する場合<br>
       ・一つの条件に複数のカードにチェックを入れて条件を設定した場合、それらのカードを一つのグループと見立てて確率を計算します。<br>
       例１：「カード１」と「カード２」にチェックを入れ、"１枚ちょうどドロー"と設定した場合<br>

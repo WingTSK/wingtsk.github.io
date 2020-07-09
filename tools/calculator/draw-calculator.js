@@ -1,6 +1,6 @@
 /**
 draw-calculator.js
-version 0.1.1
+version 0.2.0
 Copyright (c) 2020 WingTSK
 */
   let cards_counter = [];
@@ -295,7 +295,45 @@ function makeCondition(cards, cnums, consource){
         }else{
           rt[index][1] = -1;
         }
-      }
+      }else if (c[2] === 4){
+        if (c[1] === 1){
+          rt[index][0] = rt[index][0] + c[1];
+        }else if (c[1] > 1){
+          rt[index][1] = -1;
+        }
+      }else if (c[2] === 5){
+        if (c[1] === 1){
+          rt[index][0] = rt[index][0] + c[1];
+        }else if (c[1] > 1){
+          rt[index][1] = -1;
+        }else if (c[1] === 0){
+          if (rt[index][0] <= c[1] && rt[index][1] >= c[1]){
+            rt[index][0] = 0;
+            rt[index][1] = 0;
+          }else{
+            rt[index][1] = -1;
+          }
+        }
+      }else if (c[2] === 6){
+        if (c[1] === 1){
+          rt[index][1] = rt[index][1] - c[1];
+        }else if (c[1] > 1){
+          rt[index][1] = -1;
+        }
+       }else if (c[2] === 7){
+        if (c[1] === 1){
+          rt[index][1] = rt[index][1] - c[1];
+        }else if (c[1] > 1){
+          rt[index][1] = -1;
+        }else if (c[1] === 0){
+          if (rt[index][0] <= cnums[index] && rt[index][1] >= cnums[index]){
+            rt[index][0] = rt[index][0] + cnums[index];
+            rt[index][1] = cnums[index];
+          }else{
+            rt[index][1] = -1;
+          }
+        }
+     }
     }
     rtn.push(rt.slice());
   }
@@ -420,7 +458,18 @@ function addCon(num){
           '<div class="setteingcon_n">',
             '<span class="settinglabel">','／','</span>',
             '<input type="number" class="condition_n" name="condition_n_', cgid, '_', conid, '" size="15" placeholder="枚数" min="0" max="255" onclick="this.select();">',
-            '枚',
+
+            '<div class="condition_cs select">',
+              '<span class="selectmsg" msg="1" opened="0" onclick="menuopen(this)">',
+                '<div class="defaultmsg"></div>',
+                '<div class="singleselect">枚</div>',
+              '</span>',
+              '<ul class="selectbox">',
+                '<li selected="1" value="0" onclick="selectsingle(this)">枚</li>',
+                '<li selected="0" value="1" onclick="selectsingle(this)">種類</li>',
+              '</ul>',
+            '</div>',
+
           '</div>',
           '<div class="condition_m select">',
             '<span class="selectmsg" msg="1" opened="0" onclick="menuopen(this)">',
@@ -428,7 +477,7 @@ function addCon(num){
               '<div class="singleselect">以上ドロー</div>',
             '</span>',
             '<ul class="selectbox">',
-              '<li class="menumsg" onclick="event.stopPropagation()">▼▼ モード ▼▼</li>',
+              '<li class="menumsg" onclick="event.stopPropagation()">▼モード▼</li>',
               '<li selected="1" value="0" onclick="selectsingle(this)">以上ドロー</li>',
               '<li selected="0" value="1" onclick="selectsingle(this)">ちょうどドロー</li>',
               '<li selected="0" value="2" onclick="selectsingle(this)">以上デッキに残す</li>',
@@ -630,13 +679,13 @@ function drawCalc(){
           let ary = [];
           let con = $con(cgid, conid);
           let cc = con.querySelectorAll('[checked="1"]');
-          for (l=0,cclen=cc.length; l<cclen; l=(l+1)){
+          for (l=0,cclen=cc.length; l<cclen; l = (l+1)){
             ary.push(Number(cc[l].getAttribute('value')));
           }
           _cards = _cards.concat(ary.slice());
           consource[j][k].push(ary.slice());
           consource[j][k].push(Number(con.querySelector('.condition_n').value));
-          consource[j][k].push(Number(con.querySelector('.condition_m').querySelector('[selected="1"]').getAttribute("value")));
+          consource[j][k].push(Number(con.querySelector('.condition_m').querySelector('[selected="1"]').getAttribute("value")) + 4 * Number(con.querySelector('.condition_cs').querySelector('[selected="1"]').getAttribute("value")));
         }
       }
       _cards = _cards.uniq().sort(function(a, b){return a - b;});
@@ -677,7 +726,7 @@ function drawCalc(){
       }else{
         document.querySelector('#top_output > .output').innerText = 'エラー:\n有効な条件が設定されていません。';
         let rows = document.querySelectorAll(".congroup");
-        for (m = 0, rlen = rows.length; m < rlen; m=(m+1)){
+        for (m = 0, rlen = rows.length; m < rlen; m = (m+1)){
           rows[m].querySelector('.output').innerText = '設定された条件は有効ではありません。';
         }
       }
@@ -685,7 +734,7 @@ function drawCalc(){
     }else{
       document.querySelector('#top_output > .output').innerText = 'エラー:\n設定したカードの合計枚数が、デッキ枚数を超えています。';
       let rows = document.querySelectorAll(".congroup");
-      for (m = 0, rlen = rows.length; m < rlen; m=(m+1)){
+      for (m = 0, rlen = rows.length; m < rlen; m = (m+1)){
         rows[m].querySelector('.output').innerText = '';
       }
     }
@@ -696,7 +745,7 @@ function drawCalc(){
       document.querySelector('#top_output > .output').innerText = 'エラー:\nデッキまたは手札の枚数は0～255枚の範囲で設定してください。';
     }
     let rows = document.querySelectorAll(".congroup");
-    for (m = 0, rlen = rows.length; m < rlen; m=(m+1)){
+    for (m = 0, rlen = rows.length; m < rlen; m = (m+1)){
       rows[m].querySelector('.output').innerText = '';
     }
   }
@@ -759,7 +808,8 @@ function condition_in(){
         for (let k = 0; k < dst[5][j].length; k = (k+1)){
           let tcon = $con(j + 1, k + 1);
           tcon.querySelector(".condition_n").value = dst[5][j][k][1];
-          selectsingle(tcon.querySelector('.condition_m > .selectbox > [value="' + String(dst[5][j][k][2]) + '"]'))
+          selectsingle(tcon.querySelector('.condition_cs > .selectbox > [value="' + String(Math.floor(dst[5][j][k][2] / 4)) + '"]'))
+          selectsingle(tcon.querySelector('.condition_m > .selectbox > [value="' + String(dst[5][j][k][2] % 4) + '"]'))
           for (let s = 0; s < dst[5][j][k][0].length; s = (s+1)){
             selectmulti(tcon.querySelector('.selectcondition > .selectbox > [value="'+(String(cards.indexOf(dst[5][j][k][0][s]) + 1))+'"]'));
           }
