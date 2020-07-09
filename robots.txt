@@ -1,0 +1,5 @@
+User-agent : *
+
+Disallow : /tools/calculator/calculator.html?*
+
+Sitemap: https://wingtsk.github.io/sitemap.xml
