@@ -6,7 +6,7 @@ Disallow:
 
 User-agent: *
 Disallow: /*?*
-Allow: /*.js$
-Allow: /*.css$
+Allow: /*.js?
+Allow: /*.css?
 
 Sitemap: https://wingtsk.github.io/sitemap.xml
