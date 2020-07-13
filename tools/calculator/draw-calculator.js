@@ -1,6 +1,6 @@
 /**
 draw-calculator.js
-version 0.2.0
+version 0.2.1
 Copyright (c) 2020 WingTSK
 */
   let cards_counter = [];
@@ -654,7 +654,6 @@ function menuclose() {
 }
 
 function drawCalc(){
-  console.time('drawCalc');
   let deck = Number(document.getElementById('deck_n').value);
   let hand = Number(document.getElementById('hand_n').value);
   if (256 > deck && deck >= hand && hand >= 0){
@@ -749,7 +748,6 @@ function drawCalc(){
       rows[m].querySelector('.output').innerText = '';
     }
   }
-  console.timeEnd('drawCalc');
 }
 
 function condition_ex(deck, hand, cards, cnums, consource){
@@ -889,4 +887,4 @@ function convertConditionInBeta(x){
 
 
 //イベントハンドラ
-window.addEventListener('load', condition_in);
+document.addEventListener('DOMContentLoaded', condition_in);
