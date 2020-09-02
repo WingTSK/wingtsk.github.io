@@ -536,8 +536,8 @@ footer, footer > * {
 
 .condition_cs {
   display: inline-block;
-  margin-left: .5em;
-  margin-right: .5em;
+  margin-left: .25em;
+  /*! margin-right: .5em; */
   width: 4.5em;
 }
 .condition_cs > .selectmsg {
@@ -599,12 +599,13 @@ footer, footer > * {
   .settingarea {
     margin: .5em;
     width: 100%;
+    margin-left: .125em;
   }
   .settinglabel {
     display: none;
   }
   .cardname {
-    width: calc(100% - 6em);
+    width: calc(100% - 6.25em);
     height: 2em;
     margin-top: .3125em;
   }
@@ -642,6 +643,10 @@ footer, footer > * {
   .condition > .delbutton {
     margin-top: 2.5em;
     margin-bottom: 2.5em;
+  }
+  .condition_cs > ul {
+    width: 3.75em;
+    transform: translateX(0.0625em) translateY(-0.0625em);
   }
   .conbase {
     width: 100%;
@@ -707,6 +712,7 @@ footer, footer > * {
   .condition_n {
     width: 3em;
     height: 2em;
+    padding: 0.109375em;
   }
   .selectcondition {
     width: 100%;
@@ -732,9 +738,9 @@ footer, footer > * {
     font-size: 87.5%;
   }
   .condition_cs > .selectmsg {
-    width: 4em;
+    width: 3.75em;
     margin-top: 0em;
-    margin-left: 0em;
+    margin-left: 0.0625em;
   }
   
 }
