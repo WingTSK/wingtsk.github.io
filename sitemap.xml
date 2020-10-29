@@ -5,12 +5,17 @@
 <url>
   <loc>https://wingtsk.github.io/</loc>
   <priority>1.0</priority>
-  <lastmod>2020-09-03T08:17:07+09:00</lastmod>
+  <lastmod>2020-10-29T23:19:49+09:00</lastmod>
 </url>
 <url>
   <loc>https://wingtsk.github.io/tools/calculator/calculator.html</loc>
   <priority>0.8</priority>
-  <lastmod>2020-09-03T08:17:07+09:00</lastmod>
+  <lastmod>2020-10-29T23:19:49+09:00</lastmod>
+</url>
+<url>
+  <loc>https://wingtsk.github.io/tools/kinkenn/kinkenn.html</loc>
+  <priority>0.8</priority>
+  <lastmod>2020-10-29T23:19:49+09:00</lastmod>
 </url>
 
 </urlset>
