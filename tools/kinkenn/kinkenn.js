@@ -887,7 +887,7 @@ function condition_st(){
     twttr.widgets.createShareButton(location.href.replace(/\#.*$/, '').replace(/\?.*$/, ''),
       document.getElementById('tweet-area'),
       {
-        text: "ドロー確率計算機\n"
+        text: "金謙確率計算機（β版）\n"
       }
     );
   }
