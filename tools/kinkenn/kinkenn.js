@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020 WingTSK
  * 
- * kinkenn.js ver.0.0.1 2020-10-29
+ * kinkenn.js ver.0.0.2 2020-10-29
  * 
  * Based on draw-calculator.js ver.0.3.0
  */
@@ -813,7 +813,7 @@ function condition_ex(deck, hand, cards, cnums, consource){
   }
   /*IEはTwitterのサポートが終了したので分岐*/
   if (typeof twttr !== 'undefined'){
-    twttr.widgets.createShareButton(url, document.getElementById('tweet-area'), { text: "ドロー確率計算機\n確率"+document.querySelector("#top_output > .output").innerText+"でした！\n詳細は->" });
+    twttr.widgets.createShareButton(url, document.getElementById('tweet-area'), { text: "金謙確率計算機（β版）\n確率"+document.querySelector("#top_output > .output").innerText+"でした！\n詳細は->" });
   }
 }
 
