@@ -1,7 +1,9 @@
 /*
  * Copyright (c) 2020 WingTSK
  * 
- * draw-calculator.js ver.0.3.0 2020-10-29
+ * kinkenn.js ver.0.0.1 2020-10-29
+ * 
+ * Based on draw-calculator.js ver.0.3.0
  */
 
 let cards_counter = [];
@@ -105,7 +107,7 @@ function makeDrawPattern(deck, hand, cnums, pt){
 
 function drawPatternCounter(hand, cnums, other, cnlen, cv, depth, pattern, pt, rtn){
   let cd = cnums[depth];
-  for (let i = 0; i <= cd; i += 1){
+  for (let i = 0; i <= cd; i++){
     if (cv + i <= hand){
       let nextpattern = pattern * combination_pt(cd, i, pt);
       if (cnlen > depth){
@@ -147,16 +149,50 @@ function pushCoordinate(hand, cnums, other, coordinate, cv, depth, rtn){
   }
 }
 
-function calcResult(mkpat, hand, cnums, condition, coordinates){
+function calcResult(mkpat,deck, hand, cnums, condition, coordinates, kinkennmode, pt){
   let opt = [];
   for (let i = 0, len = coordinates.length; i < len; i = (i+1)){
     if (chkPattern(coordinates[i], condition)){
       opt.push(1);
     }else{
-      opt.push(0);
+      opt.push(chkKinkenn(deck, hand, cnums, coordinates[i], condition, kinkennmode, pt));
     }
   }
   return sumArrayOpt(mkpat, opt);
+}
+
+function chkKinkenn(deck, hand, cnums, coordinate, condition, kinkennmode, pt){
+  if (coordinate[0] > 0){
+    let len = condition.length;
+    let a = [];
+    let b = [];
+    let tc = 1;
+    for (let i = 0; i < len; i = (i+1)){
+      a = [];
+      tc = 1;
+      for (let j = 1, jl = condition[i].length; j < jl && tc === 1; j = (j+1)){
+        if (coordinate[j] > condition[i][j][1]){
+          tc = 0;
+        }else if (coordinate[j] < condition[i][j][0]){
+          for (let x = 0; x < (condition[i][j][0] - coordinate[j]); x += 1){
+            a.push(j);
+          }
+        }
+      }
+      if (tc === 1 && a.length === 1){
+        b.push(a[0]);
+      }
+    }
+    let c = b.uniq();
+    let s = 0;
+    for (let y = 0, clen = c.length; y < clen; y += 1){
+      s = s + cnums[c[y]];
+    }
+    let q = (1 - (combination_pt(deck - hand - s, kinkennmode, pt) / (combination_pt(deck - hand, kinkennmode, pt))));
+    return q;
+  }else{
+    return 0;
+  }
 }
 
 function chkPattern(coordinate, condition){
@@ -165,7 +201,7 @@ function chkPattern(coordinate, condition){
   let tc = 1;
   for (let i = 0; i < len && t === 0; i = (i+1)){
     tc = 1;
-    for (let j = 0, jl = condition[i].length; j < jl && tc === 1; j = (j+1)){
+    for (let j = 1, jl = condition[i].length; j < jl && tc === 1; j = (j+1)){
       if (coordinate[j] < condition[i][j][0] || coordinate[j] > condition[i][j][1]){
         tc = 0;
       }
@@ -660,18 +696,21 @@ function menuclose() {
 }
 
 function drawCalc(){
+  console.time('calc');
   let deck = Number(document.getElementById('deck_n').value);
   let hand = Number(document.getElementById('hand_n').value);
   if (256 > deck && deck >= hand && hand >= 0){
     let cards = cards_counter;
     let cs = document.querySelectorAll('.card');
+    let kinkenn = Number(document.getElementById('kinkenn').querySelector('[selected="1"]').getAttribute("value"));
+    let kinkennmode = Number(document.getElementById('kinkenncost').querySelector('[selected="1"]').getAttribute("value"));
     let cnums = [];
     for (let i = 0, cardslen = cs.length; i < cardslen; i = (i+1)){
       cnums.push(Number(cs[i].querySelector('.cardnum').value));
     }
-    if (deck >= sumArray(cnums)){
+    if (deck >= kinkenn + sumArray(cnums)){
       let consource = [];
-      let _cards = [];
+      let _cards = [0];
       let cg = document.querySelectorAll('.congroup');
       for (let j = 0, cglen = cg.length; j < cglen; j = (j+1)){
         consource[j] = [];
@@ -694,15 +733,15 @@ function drawCalc(){
         }
       }
       _cards = _cards.uniq().sort(function(a, b){return a - b;});
-      let _cnums = makeGroupNums(_cards, cards, cnums);
+      let _cnums = makeGroupNums(_cards, [0].concat(cards), [kinkenn].concat(cnums));
       let condition = makeCondition(_cards, _cnums, consource.slice());
       if (condition.length > 0){
         let pt = pascal_triangle(deck);
         let drawpat = makeDrawPattern(deck, hand, _cnums, pt);
         let coordinates = makeCoordinates(deck, hand, _cnums);
-        let result = calcResult(drawpat, hand, _cnums, condition, coordinates);
+        let result = calcResult(drawpat, deck, hand, _cnums, condition, coordinates, kinkennmode, pt);
         let str0 = "計算結果："+String(Math.round(result/combination_pt(deck,hand,pt)*1000000)/10000)+"％\n";
-        if (Math.pow(2,53) - 1 >= combination_pt(deck,hand,pt)){
+        if (kinkenn === 0 && (Math.pow(2,53) - 1) >= combination_pt(deck,hand,pt)){
           str0 = str0 + "（" + result.toLocaleString()+" ／ "+combination_pt(deck,hand,pt).toLocaleString()+"通り）";
         }
         document.querySelector('#top_output > .output').innerText = str0;
@@ -717,10 +756,10 @@ function drawCalc(){
             if (JSON.stringify(condition) === JSON.stringify(mscon)){
               r1 = result;
             }else{
-              r1 = calcResult(drawpat, hand, _cnums, mscon, coordinates);
+              r1 = calcResult(drawpat, deck, hand, _cnums, mscon, coordinates, kinkennmode, pt);
             }
             let str1 = "個別計算結果："+String(Math.round(r1/combination_pt(deck,hand,pt)*1000000)/10000)+"％\n";
-            if (Math.pow(2,53)-1 >= combination_pt(deck,hand,pt)){
+            if (kinkenn === 0 && (Math.pow(2,53)-1) >= combination_pt(deck,hand,pt)){
               str1 = str1 + "（" + r1.toLocaleString() +" ／ "+combination_pt(deck,hand,pt).toLocaleString()+"通り）";
             }
             rows[m].querySelector('.output').innerText = str1;
@@ -754,15 +793,19 @@ function drawCalc(){
       rows[m].querySelector('.output').innerText = '';
     }
   }
+  console.timeEnd('calc');
 }
 
 function condition_ex(deck, hand, cards, cnums, consource){
   let cnames = [];
   let cng = document.querySelectorAll(".cardname");
+  let kn = Number(document.getElementById('kinkenn').querySelector('[selected="1"]').getAttribute("value"));
+  let kc = Number(document.getElementById('kinkenncost').querySelector('[selected="1"]').getAttribute("value"));
+
   for (let i = 0, cl = cng.length; i < cl; i = (i+1)){
     cnames.push(cng[i].value);
   }
-  let str = "xj=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(JSON.stringify([deck, hand, cards, cnames, cnums, consource]))));
+  let str = "kn=" + kn + "&kc=" + kc + "&xj=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(JSON.stringify([deck, hand, cards, cnames, cnums, consource]))));
   let url = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + str;
   document.querySelector("#export_box").value = url;
   if (document.querySelector("#tweet-area").children.length > 0){
@@ -775,6 +818,12 @@ function condition_ex(deck, hand, cards, cnums, consource){
 }
 
 function condition_in(){
+  if (queryParam.kn && queryParam.kn >= 0 && queryParam.kn <= 3){
+    selectsingle(document.querySelector('#kinkenn > .selectbox > [value="' + queryParam.kn + '"]'));
+  }
+  if (queryParam.kc && (queryParam.kc === 3 || queryParam.kc === 6)){
+    selectsingle(document.querySelector('#kinkenncost > .selectbox > [value="' + queryParam.kn + '"]'));
+  }
   if (queryParam.xj || queryParam.x){
     let str = '';
     if (queryParam.xj){
@@ -812,8 +861,8 @@ function condition_in(){
         for (let k = 0; k < dst[5][j].length; k = (k+1)){
           let tcon = $con(j + 1, k + 1);
           tcon.querySelector(".condition_n").value = dst[5][j][k][1];
-          selectsingle(tcon.querySelector('.condition_cs > .selectbox > [value="' + String(Math.floor(dst[5][j][k][2] / 4)) + '"]'))
-          selectsingle(tcon.querySelector('.condition_m > .selectbox > [value="' + String(dst[5][j][k][2] % 4) + '"]'))
+          selectsingle(tcon.querySelector('.condition_cs > .selectbox > [value="' + String(Math.floor(dst[5][j][k][2] / 4)) + '"]'));
+          selectsingle(tcon.querySelector('.condition_m > .selectbox > [value="' + String(dst[5][j][k][2] % 4) + '"]'));
           for (let s = 0; s < dst[5][j][k][0].length; s = (s+1)){
             selectmulti(tcon.querySelector('.selectcondition > .selectbox > [value="'+(String(cards.indexOf(dst[5][j][k][0][s]) + 1))+'"]'));
           }

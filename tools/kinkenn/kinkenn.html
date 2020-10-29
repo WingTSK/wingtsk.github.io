@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,user-scalable=no">
+  <title>金謙確率計算機（β版）｜WingTSK's Project</title>
+  <link rel="stylesheet" type="text/css" href="./kinkenn.css?20200904">
+  
+  <link rel="icon" href="https://wingtsk.github.io/favicon.ico">
+  <link rel="apple-touch-icon" href="https://wingtsk.github.io/tools/calculator/img/draw-calculator.png">
+  
+  <!--Facebook Start--><!--
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="WingTSK's Project">
+  <meta property="og:title" content="金謙確率計算機（β版）｜WingTSK's Project">
+  <meta property="og:description" content="「金欲で謙虚な壺」を使用したデッキで特定のカードや組み合わせをドローできる確率を計算できます。条件が複数ある場合にも対応しています。">
+  <meta property="og:image" content="https://wingtsk.github.io/tools/calculator/img/draw-calculator-ogp.png">
+  <meta property="og:url" content="https://wingtsk.github.io/tools/calculator/calculator.html">-->
+  <!--Facebook End-->
+  
+  <!--Twitter Card Start--><!--
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@WingTSK">
+  <meta name="twitter:title" content="金謙確率計算機（β版）｜WingTSK's Project">
+  <meta name="twitter:description" content="「金欲で謙虚な壺」を使用したデッキで特定のカードや組み合わせをドローできる確率を計算できます。条件が複数ある場合にも対応しています。">
+  <meta name="twitter:image" content="https://wingtsk.github.io/tools/calculator/img/draw-calculator.png">
+  <meta name="twitter:url" content="https://wingtsk.github.io/tools/calculator/calculator.html">-->
+  <!--Twitter Card End-->
+</head>
+<body onclick="menuclose()">
+  <script type="text/javascript" src="./kinkenn.js?ver=0.0.1"></script>
+  <script type="text/javascript" src="../../external/js/rawdeflate.js"></script>
+  <script type="text/javascript" src="../../external/js/rawinflate.js"></script>
+  <script type="text/javascript" src="../../external/js/base64.js"></script>
+  <script type="text/javascript" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  <div id="main">
+    <h1><a href="./kinkenn.html">金謙確率計算機（β版）</a></h1>
+    <p>「金欲で謙虚な壺」を使用したデッキに対応したドロー確率計算機です。<br>初手計算など、遊戯王OCGでの特定のカードや組み合わせをドローできる確率を計算できます。<br>条件が複数ある場合にも対応しています。</p>
+    <p>通常版のドロー確率計算機は<a href="https://wingtsk.github.io/tools/calculator/calculator.html">コチラ</a></p>
+    <form name="calculator" autocomplete="on">
+    <div id="calc">
+      <div id="mainset">
+        <div id="deckhandset">
+          <div>基本設定:</div>
+          <div>
+            デッキ枚数:
+            <input type="number" name="deck" id="deck_n" required="required" value="40" min="0" max="255" placeholder="デッキ枚数" onclick="this.select();">枚
+          </div>
+          <div>
+            手札枚数:
+            <input type="number" name="hand" id="hand_n" required="required" value="5" min="0" max="255" placeholder="手札枚数" onclick="this.select();">枚
+          </div>
+        </div>
+        <div id="kinkennset">
+          <div>金謙設定:</div>
+          <div class="kinkenn_n">
+            投入枚数:
+            <div id="kinkenn" class="select">
+              <span class="selectmsg" msg="1" opened="0" onclick="menuopen(this)">
+                <div class="defaultmsg"></div>
+                <div class="singleselect">3</div>
+              </span>
+              <ul class="selectbox">
+                <li selected="0" onclick="selectsingle(this)" value="0">0</li>
+                <li selected="0" onclick="selectsingle(this)" value="1">1</li>
+                <li selected="0" onclick="selectsingle(this)" value="2">2</li>
+                <li selected="1" onclick="selectsingle(this)" value="3">3</li>
+              </ul>
+            </div>枚
+          </div>
+          <div class="kinkenn_n">
+            コスト枚数:
+            <div id="kinkenncost" class="select">
+              <span class="selectmsg" msg="1" opened="0" onclick="menuopen(this)">
+                <div class="defaultmsg"></div>
+                <div class="singleselect">6</div>
+              </span>
+              <ul class="selectbox">
+                <li selected="0" onclick="selectsingle(this)" value="3">3</li>
+                <li selected="1" onclick="selectsingle(this)" value="6">6</li>
+              </ul>
+            </div>枚
+          </div>
+        </div>
+        <div id="top_result">
+          <div id="top_output">
+            <div class="output">条件を入力後、電卓マークのボタンを押してください。<br>計算結果はここに表示されます。</div>
+          </div>
+          <div id="result_buttons">
+            <div>
+              <input type="text" name="export_box" id="export_box" style="width: 1px; height: 0px; border: solid 0px; padding: 0px;" readonly>
+              <input type="button" value="URLをコピー" onclick='copyToClipboard("#export_box");'>
+            </div>
+            <div id="tweet-area">
+              <!--Twitter-->
+            </div>
+          </div>
+        </div>
+        <div id="top_calc" onclick="drawCalc()" title="計算！">
+          <div class="drawcalculator"><div></div></div> 
+        </div>
+      </div>
+      <br>
+      <div id="cardset">
+        <input type="checkbox" class="checkflexbox checkbox" id="checkcardset" style="display: none;" checked><label for="checkcardset"><span class="chkarrow">▼</span>カード枚数設定（クリックで<span class="chktxt">表示</span>）</label>
+        <div id="cardsetbox"  class="chkflexcontent">
+          <div id="addcard" class="addcard" onclick="addCard()" title="カードを追加">
+            <div class="addbtn"><div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div id="conset">
+        <input type="checkbox" class="checkflexbox checkbox" id="checkconset" style="display: none;" checked><label for="checkconset"><span class="chkarrow">▼</span>条件設定（クリックで<span class="chktxt">表示</span>）</label>
+        <div id="consetbox" class="chkflexcontent">
+          <div id="addcongroup" class="addcongroup" onclick="addConGroup()" title="パターンを追加">
+            <div class="addbtn"><div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </form>
+    <p>
+      <br>※このドロー確率計算機はjavascriptを使用しています。有効になっていない場合は動作しません。
+      <br>※初手計算の範囲を大幅に超えるような複雑な条件を設定した場合、計算に時間がかかる場合やフリーズする場合があります。
+      <br>※このドロー確率計算機を使用したことにより生じたいかなる損害に対しても、作者は責任を負わないものとします。
+    </p>
+    <div id="bottom_calc" class="drawcalculator" onclick="scrolltop();drawCalc()" title="計算！"><div></div></div>
+  </div>
+  <footer>
+    <hr />
+    <nav id="footerrnav">
+    </nav>
+    &copy;2020 <a href="https://twitter.com/WingTSK" target="_blank">WingTSK</a>
+  </footer>
+</body>
+</html>

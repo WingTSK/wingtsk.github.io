@@ -29,14 +29,15 @@
   <!--Twitter Card End-->
 </head>
 <body onclick="menuclose()">
-  <script type="text/javascript" src="./draw-calculator.js?var=0.2.1"></script>
+  <script type="text/javascript" src="./draw-calculator.js?ver=0.3.0"></script>
   <script type="text/javascript" src="../../external/js/rawdeflate.js"></script>
   <script type="text/javascript" src="../../external/js/rawinflate.js"></script>
   <script type="text/javascript" src="../../external/js/base64.js"></script>
   <script type="text/javascript" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
   <div id="main">
     <h1><a href="./calculator.html">ドロー確率計算機</a></h1>
-    <p>トレーディングカードゲームなどで、特定のカードや組み合わせをドローできる確率を計算できます。<br>条件が複数ある場合にも対応しています。</p>
+    <p>遊戯王OCGの初手計算など、トレーディングカードゲームで特定のカードや組み合わせをドローできる確率を計算できます。<br>条件が複数ある場合にも対応しています。</p>
+    <p>「金欲で謙虚な壺」を使用したデッキに対応したバージョンは<a href="https://wingtsk.github.io/tools/kinkenn/kinkenn.html">コチラ</a></p>
     <form name="calculator" autocomplete="on">
     <div id="calc">
       <div id="mainset">
@@ -95,15 +96,13 @@
     <div class="chkmenu">
       <input type="checkbox" class="checkbox" id="checkbox1" style="display: none;"><label for="checkbox1"><span class="chkarrow">▼</span> 使い方（クリックで<span class="chktxt">表示</span>）</label>
       <div class="chkcontent" id="chkcontent1">
-      「基本設定：」では、デッキ（山札）の枚数と、引いている手札の枚数を設定します。<br>
-      例えば、「40枚のデッキから5枚引く場合」の確率を計算したい場合は、「デッキ枚数：」に「40」、「手札枚数：」に「5」を、それぞれ入力してください。<br><br>
+      「基本設定：」では、デッキ（山札）の枚数と、引いている手札の枚数を設定します。<br><br>
       「カード枚数設定:」では、カード名と、そのカードをデッキに投入している枚数を設定します。<br>
       設定するカードを増やす場合は、「カード枚数設定:」の一番最後の「＋」ボタンを押すことで、入力欄を増やすことができます。<br>
       カード名は、デフォルトのままでも計算そのものに影響は与えませんが、設定しておくと条件設定の際にカードを選びやすくなるため、オススメです。<br><br>
       「条件設定：」では、確率を計算したい手札のパターン（どのような引き方か）を設定します。<br>
       １つのパターンに複数のカードに対して条件を設定したい場合は、そのパターンの端にある「＆」ボタンを押すことで、入力欄を増やすことができます。<br>
       複数のパターンで計算したい場合は、「条件設定：」の一番最後の「＋」ボタンを押すことで、パターンを増やすことができます。<br>
-      （条件の詳しい設定方法や仕様については、下の「条件の設定方法」をご確認ください。）<br>
       </div>
     </div>
     <br>
@@ -166,7 +165,7 @@
     <hr />
     <nav id="footerrnav">
     </nav>
-    &copy;2020 WingTSK
+    &copy;2020 <a href="https://twitter.com/WingTSK" target="_blank">WingTSK</a>
   </footer>
 </body>
 </html>
