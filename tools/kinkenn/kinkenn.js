@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020 WingTSK
  * 
- * kinkenn.js ver.0.0.2 2020-10-29
+ * kinkenn.js ver.0.0.3 2020-10-30
  * 
  * Based on draw-calculator.js ver.0.3.0
  */
@@ -186,7 +186,9 @@ function chkKinkenn(deck, hand, cnums, coordinate, condition, kinkennmode, pt){
     let c = b.uniq();
     let s = 0;
     for (let y = 0, clen = c.length; y < clen; y += 1){
-      s = s + cnums[c[y]];
+      if (cnums[c[y]] - coordinate[y] > 0){
+        s = s + cnums[c[y]] - coordinate[y];
+      }
     }
     let q = (1 - (combination_pt(deck - hand - s, kinkennmode, pt) / (combination_pt(deck - hand, kinkennmode, pt))));
     return q;
