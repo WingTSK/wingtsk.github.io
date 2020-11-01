@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020 WingTSK
  * 
- * kinkenn.js ver.0.0.4 2020-11-01
+ * kinkenn.js */ version = "0.0.5 Beta"; /* 2020-11-01
  * 
  * Based on draw-calculator.js ver.0.3.0
  */
@@ -945,3 +945,4 @@ function convertConditionInBeta(x){
 
 //イベントハンドラ
 document.addEventListener('DOMContentLoaded', condition_in);
+document.addEventListener('DOMContentLoaded', function (){document.getElementById("version").innerText = "version " + version;});
