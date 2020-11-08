@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020 WingTSK
  * 
- * draw-calculator.js ver.0.3.0 2020-10-29
+ * draw-calculator.js */version = '0.3.1'; /* 2020-11-08
  */
 
 let cards_counter = [];
@@ -29,19 +29,87 @@ const $cid = function(cid){return document.querySelector('[cid="' + String(cid) 
 const $cgid = function(cgid){return document.querySelector('[cgid="' + String(cgid) + '"]');};
 const $con = function(cgid, conid){return $cgid(cgid).querySelector('[conid="' + String(conid) + '"].condition');};
 const $conand = function(cgid, conid){return $cgid(cgid).querySelector('[conid="' + String(conid) + '"].andblock');};
+const NUMBER_DECIMIAL_PLACES = 4;
+
+/* polyfill */
+
+// https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Array/fill
+if (!Array.prototype.fill) {
+  Object.defineProperty(Array.prototype, 'fill', {
+    value: function(value) {
+      if (this == null) {
+        throw new TypeError('this is null or not defined');
+      }
+      var O = Object(this);
+      var len = O.length >>> 0;
+      var start = arguments[1];
+      var relativeStart = start >> 0;
+      var k = relativeStart < 0 ?
+        Math.max(len + relativeStart, 0) :
+        Math.min(relativeStart, len);
+      var end = arguments[2];
+      var relativeEnd = end === undefined ?
+        len : end >> 0;
+      var final = relativeEnd < 0 ?
+        Math.max(len + relativeEnd, 0) :
+        Math.min(relativeEnd, len);
+      while (k < final) {
+        O[k] = value;
+        k++;
+      }
+      return O;
+    }
+  });
+}
+
+// Production steps of ECMA-262, Edition 5, 15.4.4.19
+// Reference: http://es5.github.io/#x15.4.4.19
+if (!Array.prototype.map) {
+  Array.prototype.map = function(callback/*, thisArg*/) {
+    var T, A, k;
+    if (this == null) {
+      throw new TypeError('this is null or not defined');
+    }
+    var O = Object(this);
+    var len = O.length >>> 0;
+    if (typeof callback !== 'function') {
+      throw new TypeError(callback + ' is not a function');
+    }
+    if (arguments.length > 1) {
+      T = arguments[1];
+    }
+    A = new Array(len);
+    k = 0;
+    while (k < len) {
+      var kValue, mappedValue;
+      if (k in O) {
+        kValue = O[k];
+        mappedValue = callback.call(T, kValue, k, O);
+        A[k] = mappedValue;
+      }
+      k++;
+    }
+    return A;
+  };
+}
+/* */
 
 Array.prototype.uniq = function (){
   if (!Array.from){
-    return this.map(function (x){return JSON.stringify(x)}).filter(function (x, i, self){return self.indexOf(x) === i;}).map(function (x){return JSON.parse(x)});
+    return this.filter(function (x, i, self){return self.indexOf(x) === i;});
   }else{
-    return Array.from(new Set(this.map(function (x){return JSON.stringify(x)}))).map(function (x){return JSON.parse(x)});
+    return Array.from(new Set(this));
   }
 }
 
+Array.prototype.uniqObj = function (){
+  return this.map(function (x){return JSON.stringify(x)}).uniq().map(function (x){return JSON.parse(x)});
+}
+
 function sumArray(ary){
-  let s = 0;
-  for (let i = 0; i < ary.length; i = (i+1)){
-    s = s + ary[i];
+  let s = ary[0];
+  for (let i = 1; i < ary.length; i += 1){
+    s += ary[i];
   }
   return s;
 }
@@ -50,7 +118,7 @@ function combination(n, r){
   if (n >= r && r >= 0){
     let k = Math.min(r, n - r);
     let c = 1;
-    for (let i = 0; i < k; i = (i+1)){
+    for (let i = 0; i < k; i += 1){
       c = c * (n - i) / (1 + i);
     }
     return c;
@@ -61,9 +129,9 @@ function combination(n, r){
 
 function pascal_triangle(n){
   let a = [];
-  for (let i = 0; i <= n; i = (i+1)){
+  for (let i = 0; i <= n; i += 1){
     let b = [];
-    for (let j = 0; j <= i/2; j = (j+1)){
+    for (let j = 0; j <= i/2; j += 1){
       if (i === 0 || j === 0){
         b.push(1);
       }else{
@@ -81,7 +149,7 @@ function pascal_triangle(n){
 
 function combination_pt(n, r, pt){
   if (n >= r && r >= 0){
-    if (typeof(pt) !== "undefined"){
+    if (typeof(pt) !== 'undefined'){
       let k = Math.min(r, n - r);
       return pt[n][k];
     }else{
@@ -92,42 +160,11 @@ function combination_pt(n, r, pt){
   }
 }
 
-function makeDrawPattern(deck, hand, cnums, pt){
-  let other = deck - sumArray(cnums);
-  let cnlen = cnums.length - 1;
-  let cv = 0;
-  let depth = 0;
-  let pattern = 1;
-  let rtn = [];
-  drawPatternCounter(hand, cnums, other, cnlen, cv, depth, pattern, pt, rtn);
-  return rtn;
-}
-
-function drawPatternCounter(hand, cnums, other, cnlen, cv, depth, pattern, pt, rtn){
-  let cd = cnums[depth];
-  for (let i = 0; i <= cd; i += 1){
-    if (cv + i <= hand){
-      let nextpattern = pattern * combination_pt(cd, i, pt);
-      if (cnlen > depth){
-        drawPatternCounter(hand, cnums, other, cnlen, cv + i, depth + 1, nextpattern, pt, rtn);
-      }else{
-        if (other >= hand - (cv + i)){
-          nextpattern = nextpattern * combination_pt(other, hand - (cv + i), pt);
-          rtn.push(nextpattern);
-        }
-      }
-    }
-  }
-}
-
 function makeCoordinates(deck, hand, cnums){
   let other = deck - sumArray(cnums);
-  let coordinate = [];
+  let coordinate = new Array(cnums.length).fill(0);
   let cv = 0;
   let depth = 0;
-  for (let i = 0; i < cnums.length; i = (i+1)){
-    coordinate[i] = 0;
-  }
   let rtn = [];
   pushCoordinate(hand, cnums, other, coordinate, cv, depth, rtn);
   return rtn.slice();
@@ -147,25 +184,43 @@ function pushCoordinate(hand, cnums, other, coordinate, cv, depth, rtn){
   }
 }
 
-function calcResult(mkpat, hand, cnums, condition, coordinates){
-  let opt = [];
-  for (let i = 0, len = coordinates.length; i < len; i = (i+1)){
-    if (chkPattern(coordinates[i], condition)){
-      opt.push(1);
-    }else{
-      opt.push(0);
+function calcResult(deck, hand, cnums, condition, pt){
+  let other = deck - sumArray(cnums);
+  let coordinate = new Array(cnums.length).fill(0);
+  let coorlen = coordinate.length - 1;
+  let cv = 0;
+  let depth = 0;
+  let pattern = 1;
+  return patCalcResult(hand, cnums, condition, other, coordinate, coorlen, cv, depth, pattern, pt);
+}
+
+function patCalcResult(hand, cnums, condition, other, coordinate, coorlen, cv, depth, pattern, pt){
+  let rtn = 0;
+  let cd = cnums[depth];
+  for (coordinate[depth] = 0; cv + coordinate[depth] <= hand; coordinate[depth] = (coordinate[depth] + 1)){
+    if (coordinate[depth] <= cd){
+      let nextpattern = pattern * combination_pt(cd, coordinate[depth], pt);
+      if (depth < coorlen){
+        rtn = rtn + patCalcResult(hand, cnums, condition, other, coordinate, coorlen, cv + coordinate[depth], depth + 1, nextpattern, pt);
+      }else{
+        if (other >= hand - (cv + coordinate[depth])){
+          if (chkPattern(coordinate, condition)){
+            rtn = rtn + (nextpattern * combination_pt(other, hand - (cv + coordinate[depth]), pt));
+          }  
+        }
+      }
     }
   }
-  return sumArrayOpt(mkpat, opt);
+  return rtn;
 }
 
 function chkPattern(coordinate, condition){
   let len = condition.length;
   let t = 0;
   let tc = 1;
-  for (let i = 0; i < len && t === 0; i = (i+1)){
+  for (let i = 0; i < len && t === 0; i += 1){
     tc = 1;
-    for (let j = 0, jl = condition[i].length; j < jl && tc === 1; j = (j+1)){
+    for (let j = 0, jl = condition[i].length; j < jl && tc === 1; j += 1){
       if (coordinate[j] < condition[i][j][0] || coordinate[j] > condition[i][j][1]){
         tc = 0;
       }
@@ -175,33 +230,16 @@ function chkPattern(coordinate, condition){
   return t;
 }
 
-function sumArrayOpt(ary, optAry){
-  let s = 0, al = ary.length, ol = optAry.length;
-  if (al === ol){
-    for (let i = 0; i < al; i = (i+1)){
-      s = s + ary[i] * optAry[i];
-    }
-  }
-  return s;
-}
-
-function makeDefaultCondition(cnums, vari){
-  let def = [];
-  for (let s = 0; s < vari; s = (s+1)){
-    let ary = [];
-    ary.push(0);
-    ary.push(cnums[s]);
-    def.push(ary.slice());
-  }
-  return def;
+function makeDefaultCondition(cnums){
+  return new Array(cnums.length).fill().map(function(_, i){
+    return [0, cnums[i]];
+  });
 }
 
 function makeGroupNums(group, cards, cnums){
-  let rtn = [];
-  for (let i = 0, len = group.length; i < len; i = (i+1)){
-    rtn.push(cnums[cards.indexOf(group[i])]);
-  }
-  return rtn;
+  return new Array(group.length).fill().map(function(_, i){
+    return cnums[cards.indexOf(group[i])];
+  });
 }
 
 //ブロックごとの指定カードの枚数座標リストの生成
@@ -211,43 +249,67 @@ function makeConditionCoordinates(group, cards, cnums, num){
 }
 
 //ブロックごとの条件[ID-枚数-モード]の生成
-function makeConditionBlock(group, mode, conCoor){
-  let gl = group.length;
-  let cclen = conCoor.length;
-  let rtn = [];
-  for (let i = 0; i < cclen; i = (i+1)){
-    let rtn0 = [];
-    for (let j = 0; j < gl; j = (j+1)){
-      let rtn1 = [];
-      rtn1.push(group[j]);
-      rtn1.push(conCoor[i][j]);
-      rtn1.push(mode);
-      rtn0.push(rtn1.slice());
-    }
-    rtn.push(rtn0.slice());
-  }
-  return rtn;
+function makeConditionBlock(group, conCoor, mode){
+  return new Array(conCoor.length).fill().map(function(_, i){
+    return new Array(group.length).fill().map(function(_, j){
+      return [group[j], conCoor[i][j], mode];
+    });
+  });
 }
 
 //ブロックごとの条件を合成
-function makeConditionGroup(ary1, ary2){
-  if (ary1.length + ary2.length){
-    let rtn = [];
-    let sl = ary1.length;
-    let ll = ary2.length;
-    if (Math.min(ary1.length, ary2.length) === 0){
-      return [];
-    }else{
-      for (let i = 0; i < sl; i = (i+1)){
-        for (let j = 0; j < ll; j = (j+1)){
-          rtn.push([].concat(ary1[i]).concat(ary2[j]));
-        }
-      }
-      return rtn;
-    }
-  }else{
+function makeConditionGroup(a, b){
+  let rtn = [];
+  let al = a.length;
+  let bl = b.length;
+  if (Math.min(al, bl) === 0){
     return [];
+  }else{
+    for (let i = 0; i < al; i += 1){
+      for (let j = 0; j < bl; j += 1){
+        rtn.push([].concat(a[i]).concat(b[j]));
+      }
+    }
+    return rtn;
   }
+}
+
+function chkCondition(con, cnums){
+  let len = con.length;
+  let chk = 1;
+  for (let i = 0; i < len; i += 1){
+    if (con[i][0] > cnums[i] || con[i][1] < 0 || con[i][0] > con[i][1]){
+      chk = 0;
+    }
+  }
+  return chk;
+}
+
+function makeConTemp(cards, cnums, consource){
+  let conTemp = [];
+  for (let i=0, cslen = consource.length; i < cslen; i += 1){
+    let csBlock = consource[ i ];
+    let blocklen = csBlock.length;
+    let conGroup = new Array(blocklen).fill().map(function(_, j){
+      let ids = csBlock[j][0], num = csBlock[j][1], mode = csBlock[j][2];
+      return makeConditionBlock(
+        ids,
+        makeConditionCoordinates(
+          ids,
+          cards,
+          cnums,
+          num
+        ),
+        mode
+      )
+    });
+    let tmpary = conGroup[0];
+    for (let m = 1; m < blocklen; m += 1){
+      tmpary = makeConditionGroup(tmpary, conGroup[m]);
+    }
+    conTemp = conTemp.concat(tmpary.slice());
+  }
+  return conTemp;
 }
 
 /*条件配列の変換 consource : [[[[id, id, ...], num, mode], ...], ...]
@@ -256,113 +318,75 @@ function makeConditionGroup(ary1, ary2){
  */
 function makeCondition(cards, cnums, consource){
   let rtn = [];
-  let conTemp = [];
-  for (let i=0, ilim = consource.length; i < ilim; i=(i+1)){
-    let conGroup = [];
-    let csBlock = consource[ i ];
-    let jlim = csBlock.length;
-    for (let j = 0; j < jlim; j = (j+1)){
-      let group = csBlock[j][0];
-      let num = csBlock[j][1];
-      let mode = csBlock[j][2];
-      let conCoor = makeConditionCoordinates(group, cards, cnums, num);
-      conGroup.push(makeConditionBlock(group, mode, conCoor));
-    }
-    let tmpary = conGroup[0];
-    for (let m = 1; m < jlim; m = (m+1)){
-      tmpary = makeConditionGroup(tmpary, conGroup[m]);
-    }
-    conTemp = conTemp.concat(tmpary.slice());
-  }
-  let cgl = conTemp.length;
-  let vari = cards.length;
-  let def = JSON.stringify(makeDefaultCondition(cnums, vari));
-  for (let i = 0; i < cgl; i = (i+1)){
+  let conTemp = makeConTemp(cards, cnums, consource);
+  let def = JSON.stringify(makeDefaultCondition(cnums));
+  for (let i = 0, templen = conTemp.length; i < templen; i += 1){
     let rt = JSON.parse(def);
-    let conil = conTemp[i].length
-    for (let j = 0; j < conil; j = (j+1)){
+    for (let j = 0, idslen = conTemp[i].length; j < idslen; j += 1){
       let c = conTemp[i][j];
-      let index = cards.indexOf(c[0]);
-      if (c[2] === 0){
-        rt[index][0] = rt[index][0] + c[1];
-      }else if (c[2] === 1){
-        if (rt[index][0] <= c[1] && rt[index][1] >= c[1]){
-          rt[index][0] = rt[index][0] + c[1];
-          rt[index][1] = c[1];
+      let id = c[0], num = c[1], mode = c[2];
+      let index = cards.indexOf(id);
+      if (mode === 0){
+        rt[index][0] = rt[index][0] + num;
+      }else if (mode === 1){
+        if (rt[index][0] === 0 && rt[index][1] === cnums[index]){
+          rt[index][0] = num;
+          rt[index][1] = num;
         }else{
           rt[index][1] = -1;
         }
-      }else if (c[2] === 2){
-        rt[index][1] = rt[index][1] - c[1];
-      }else if (c[2] === 3){
-        if (rt[index][0] <= (cnums[index] - c[1]) && rt[index][1] >= (cnums[index] - c[1])){
-          rt[index][0] = rt[index][0] + cnums[index] - c[1];
-          rt[index][1] = cnums[index] - c[1];
+      }else if (mode === 2){
+        rt[index][1] = rt[index][1] - num;
+      }else if (mode === 3){
+        if (rt[index][0] === 0 && rt[index][1] === cnums[index]){
+          rt[index][0] = cnums[index] - num;
+          rt[index][1] = cnums[index] - num;
         }else{
           rt[index][1] = -1;
         }
-      }else if (c[2] === 4){
-        if (c[1] === 1){
-          rt[index][0] = rt[index][0] + c[1];
-        }else if (c[1] > 1){
+      }else if (mode === 4){
+        if (num === 1){
+          rt[index][0] = rt[index][0] + num;
+        }else if (num > 1){
           rt[index][1] = -1;
         }
-      }else if (c[2] === 5){
-        if (c[1] === 1){
-          rt[index][0] = rt[index][0] + c[1];
-        }else if (c[1] > 1){
+      }else if (mode === 5){
+        if (num === 1){
+          rt[index][0] = rt[index][0] + num;
+        }else if (num > 1){
           rt[index][1] = -1;
-        }else if (c[1] === 0){
-          if (rt[index][0] <= c[1] && rt[index][1] >= c[1]){
-            rt[index][0] = 0;
-            rt[index][1] = 0;
+        }else if (num === 0){
+          if (rt[index][0] === 0 && rt[index][1] === cnums[index]){
+            rt[index][1] = 0; /* rt[index][1] - cnums[index]; */
           }else{
             rt[index][1] = -1;
           }
         }
-      }else if (c[2] === 6){
-        if (c[1] === 1){
-          rt[index][1] = rt[index][1] - c[1];
-        }else if (c[1] > 1){
+      }else if (mode === 6){
+        if (num === 1){
+          rt[index][1] = rt[index][1] - num;
+        }else if (num > 1){
           rt[index][1] = -1;
         }
-       }else if (c[2] === 7){
-        if (c[1] === 1){
-          rt[index][1] = rt[index][1] - c[1];
-        }else if (c[1] > 1){
+       }else if (mode === 7){
+        if (num === 1){
+          rt[index][1] = rt[index][1] - num;
+        }else if (num > 1){
           rt[index][1] = -1;
-        }else if (c[1] === 0){
-          if (rt[index][0] <= cnums[index] && rt[index][1] >= cnums[index]){
-            rt[index][0] = rt[index][0] + cnums[index];
-            rt[index][1] = cnums[index];
+        }else if (num === 0){
+          if (rt[index][0] === 0 && rt[index][1] === cnums[index]){
+            rt[index][0] = cnums[index];
           }else{
             rt[index][1] = -1;
           }
         }
-     }
+      }
     }
     rtn.push(rt.slice());
   }
   //最適化
-  let rtnlen = rtn.length;
-  let minirtn = [];
-  if (rtn.length > 0){
-    for (let k = 0; k < rtnlen; k = (k+1)){
-      let rklen = rtn[k].length;
-      let chk = 1;
-      for (let m = 0; m < rklen; m = (m+1)){
-        if (rtn[k][m][0] > cnums[m] || rtn[k][m][1] < 0 || rtn[k][m][0] > rtn[k][m][1]){
-          chk = 0;
-        }
-      }
-      if (chk === 1){
-        minirtn.push(rtn[k]);
-      }
-    }
-  }
-  return minirtn.uniq();
+  return rtn.filter(function (x){return chkCondition(x, cnums)}).uniqObj();
 }
-
 
 function addCard(){
   let newcard = document.createElement("div");
@@ -394,7 +418,7 @@ function addCard(){
   csbox.insertBefore(newcard, addc);
   let cls = document.querySelectorAll(".selectcondition");
   let clsl = cls.length;
-  for (let i = 0; i < clsl; i=(i+1)){
+  for (let i = 0; i < clsl; i += 1){
     let newoption = document.createElement("li");
     newoption.setAttribute("checked","0");
     newoption.setAttribute("onclick","selectmulti(this)");
@@ -414,7 +438,7 @@ function deleteCard(num){
   });
   let vg = document.querySelectorAll(".selectcondition");
   let vgl = vg.length;
-  for (let i = 0; i < vgl; i = (i+1)){
+  for (let i = 0; i < vgl; i += 1){
     let deltarget = vg[i].querySelector('.selectbox > [value="' + cid + '"]');
     deltarget.parentNode.removeChild(deltarget);
   }
@@ -433,12 +457,11 @@ function addCon(num){
     if (con_counter[index].length){
       conid = String(con_counter[index][con_counter[index].length - 1] + 1);
     }
-    con_counter[index].push(Number(conid));
     newcon.setAttribute("id", "con_" + cgid + "_" + conid);
     newcon.setAttribute("conid", conid);
     newcon.className = "condition";
     let clist = ('');
-    for (let i = 0; i < cards_counter.length; i=(i+1)){
+    for (let i = 0; i < cards_counter.length; i += 1){
       let ci = String(cards_counter[i]);
       let cn = $cid(ci).querySelector('.cardname').value
       clist = clist + '<li checked="0" onclick="selectmulti(this)" value="' + ci + '">' + cn + '</li>';
@@ -493,17 +516,21 @@ function addCon(num){
         '</div>',
       '</div>'
       ].join('');
-    newandblock.setAttribute("conid", conid);
-    newandblock.className = "andblock";
-    /** newandblock.inner */
-    let newandmark = document.createElement("span");
-    newandmark.className = "andmark";
-    newandmark.innerHTML = "";
-    newandblock.appendChild(newandmark);
     /** */
     let inner = $cgid(cgid).querySelector(".congroupinner");
+    if (conid !== '1'){
+      newandblock.setAttribute("conid", String(con_counter[index][con_counter[index].length - 1]));
+      newandblock.className = "andblock";
+    /** newandblock.inner */
+      let newandmark = document.createElement("span");
+      newandmark.className = "andmark";
+      newandmark.innerHTML = "";
+      newandblock.appendChild(newandmark);
+
+      inner.appendChild(newandblock);
+    }
     inner.appendChild(newcon);
-    inner.appendChild(newandblock);
+    con_counter[index].push(Number(conid));
   }
 }
 
@@ -513,6 +540,9 @@ function deleteCon(cgid, conid){
   if (con_counter[cgindex].length > 1){
     let targetcon = $con(cgid, conid);
     let targetaddblock = $conand(cgid, conid);
+    if (conindex === con_counter[cgindex].length - 1){
+      targetaddblock = $conand(cgid, con_counter[cgindex][conindex - 1]);
+    }
     targetcon.parentNode.removeChild(targetcon);
     targetaddblock.parentNode.removeChild(targetaddblock);
     con_counter[cgindex] = con_counter[cgindex].filter(function(item,index){
@@ -574,7 +604,7 @@ function updateOption(num){
   let cid = String(num);
   let cls = document.querySelectorAll(".selectcondition");
   let clsl = cls.length;
-  for (let i = 0; i < clsl; i = (i+1)){
+  for (let i = 0; i < clsl; i += 1){
     cls[i].querySelector('.selectbox > [value="' + cid + '"]').innerText = n;
   }
   refselectmulti(cls);
@@ -587,7 +617,7 @@ function selectsingle(e){
   let selectmsg = menu.querySelector('.selectmsg');
   let msg = selectmsg.querySelector('.singleselect');
   let selected = list.querySelectorAll('[selected="1"]');
-  for (let i = 0, len = selected.length; i < len; i = (i+1)){
+  for (let i = 0, len = selected.length; i < len; i += 1){
     selected[i].setAttribute("selected", "0");
   }
   e.setAttribute("selected", "1");
@@ -622,7 +652,7 @@ function selectmulti(e){
 
 function refselectmulti(selects){
   let len = selects.length;
-  for (i = 0; i < len; i = (i+1)){
+  for (i = 0; i < len; i += 1){
     let menu = selects[i];
     let selectmsg = menu.querySelector('.selectmsg');
     let list = menu.querySelector('.selectbox')
@@ -654,112 +684,155 @@ function menuopen(e){
 }
 function menuclose() {
   let te = document.querySelectorAll('[opened="1"].selectmsg');
-  for (let i = 0, elen = te.length; i < elen; i = (i+1)){
+  for (let i = 0, elen = te.length; i < elen; i += 1){
     te[i].setAttribute("opened","0");
   }
 }
 
+function getDeckNum(){
+  return Number(document.getElementById('deck_n').value);
+}
+
+function getHandNum(){
+  return Number(document.getElementById('hand_n').value);
+}
+
+function getCardsNums(){
+  let cards = document.querySelectorAll('.card');
+  return new Array(cards.length).fill().map(function(_, i){
+    let num = Number(cards[i].querySelector('.cardnum').value);
+    if (num > 0){
+      return num;
+    }else{
+      return 0;
+    }
+  });
+}
+
+function makeConSource(){
+  let consource = [];
+  let cg = document.querySelectorAll('.congroup');
+  for (let j = 0, cglen = cg.length; j < cglen; j += 1){
+    consource[j] = [];
+    let cgid = cg_index[j];
+    let conids = con_counter[j];
+    let conlen = conids.length;
+    for (k = 0; k < conlen; k += 1){
+      consource[j][k] = [];
+      let conid = conids[k];
+      let ary = [];
+      let con = $con(cgid, conid);
+      let cc = con.querySelectorAll('[checked="1"]');
+      for (l = 0, cclen = cc.length; l < cclen; l += 1){
+        ary.push(Number(cc[l].getAttribute('value')));
+      }
+      consource[j][k].push(ary.slice());
+      consource[j][k].push(Number(con.querySelector('.condition_n').value));
+      consource[j][k].push(Number(con.querySelector('.condition_m').querySelector('[selected="1"]').getAttribute("value")) + 4 * Number(con.querySelector('.condition_cs').querySelector('[selected="1"]').getAttribute("value")));
+    }
+  }
+  return consource;
+}
+
+function outputTop(str){
+  document.querySelector('#top_output > .output').innerText = str;
+}
+
+function outputCon(str, num){
+  let rows = document.querySelectorAll(".congroup");
+  if (0 <= num && num < rows.length){
+    rows[num].querySelector('.output').innerText = str;
+  }
+}
+
+function outputConAll(str){
+  for (let i = 0, len = makeConSource().length; i < len; i += 1){
+    outputCon(str, i);
+  }
+}
+
+function getPersent(p, n){
+  if (Number(p) === p && Number(n) === n){
+    return Math.round(p * Math.pow(10, n+2)) / Math.pow(10, n);
+  }
+}
+
+function makeTopOutputMsg(result, deck, hand, pt){
+  let drawPat = combination_pt(deck, hand, pt);
+  let str = '計算結果：' + getPersent(result / drawPat, NUMBER_DECIMIAL_PLACES) + '％\n';
+  if (Math.pow(2,53) - 1 >= drawPat){
+    str = str + '(' + result.toLocaleString() + ' ／ ' + drawPat.toLocaleString() + '通り）';
+  }
+  return str;
+}
+
 function drawCalc(){
-  let deck = Number(document.getElementById('deck_n').value);
-  let hand = Number(document.getElementById('hand_n').value);
+  console.time('drawCalc');
+  let deck = getDeckNum();
+  let hand = getHandNum();
   if (256 > deck && deck >= hand && hand >= 0){
     let cards = cards_counter;
-    let cs = document.querySelectorAll('.card');
-    let cnums = [];
-    for (let i = 0, cardslen = cs.length; i < cardslen; i = (i+1)){
-      cnums.push(Number(cs[i].querySelector('.cardnum').value));
-    }
+    let cnums = getCardsNums();
     if (deck >= sumArray(cnums)){
-      let consource = [];
-      let _cards = [];
-      let cg = document.querySelectorAll('.congroup');
-      for (let j = 0, cglen = cg.length; j < cglen; j = (j+1)){
-        consource[j] = [];
-        let cgid = cg_index[j];
-        let conids = con_counter[j];
-        let conlen = conids.length;
-        for (k = 0; k < conlen; k = (k+1)){
-          consource[j][k] = [];
-          let conid = conids[k];
-          let ary = [];
-          let con = $con(cgid, conid);
-          let cc = con.querySelectorAll('[checked="1"]');
-          for (l=0,cclen=cc.length; l<cclen; l = (l+1)){
-            ary.push(Number(cc[l].getAttribute('value')));
+      let consource = makeConSource();
+      let _cards = (function(consource){
+        let ary = [];
+        for (let i = 0; i < consource.length; i += 1){
+          for (let j = 0; j < consource[i].length; j += 1){
+            ary = ary.concat(consource[i][j][0]);
           }
-          _cards = _cards.concat(ary.slice());
-          consource[j][k].push(ary.slice());
-          consource[j][k].push(Number(con.querySelector('.condition_n').value));
-          consource[j][k].push(Number(con.querySelector('.condition_m').querySelector('[selected="1"]').getAttribute("value")) + 4 * Number(con.querySelector('.condition_cs').querySelector('[selected="1"]').getAttribute("value")));
         }
-      }
-      _cards = _cards.uniq().sort(function(a, b){return a - b;});
+        return ary.uniq().sort(function(a, b){
+          return a - b;
+        });
+      })(consource);
       let _cnums = makeGroupNums(_cards, cards, cnums);
       let condition = makeCondition(_cards, _cnums, consource.slice());
       if (condition.length > 0){
         let pt = pascal_triangle(deck);
-        let drawpat = makeDrawPattern(deck, hand, _cnums, pt);
-        let coordinates = makeCoordinates(deck, hand, _cnums);
-        let result = calcResult(drawpat, hand, _cnums, condition, coordinates);
-        let str0 = "計算結果："+String(Math.round(result/combination_pt(deck,hand,pt)*1000000)/10000)+"％\n";
-        if (Math.pow(2,53) - 1 >= combination_pt(deck,hand,pt)){
-          str0 = str0 + "（" + result.toLocaleString()+" ／ "+combination_pt(deck,hand,pt).toLocaleString()+"通り）";
-        }
-        document.querySelector('#top_output > .output').innerText = str0;
+        let result = calcResult(deck, hand, _cnums, condition, pt);
+        outputTop(makeTopOutputMsg(result, deck, hand, pt));
         let cl = consource.length;
-        let rows = document.querySelectorAll(".congroup");
-        for (let m = 0; m < cl; m=(m+1)){
+        for (let m = 0; m < cl; m += 1){
           let scon = [];
           scon.push(consource[m]);
           let mscon = makeCondition(_cards, _cnums, scon);
           if (mscon.length > 0){
-            let r1 = 0;
+            let msresult = 0;
             if (JSON.stringify(condition) === JSON.stringify(mscon)){
-              r1 = result;
+              msresult = result;
             }else{
-              r1 = calcResult(drawpat, hand, _cnums, mscon, coordinates);
+              msresult = calcResult(deck, hand, _cnums, mscon, pt);
             }
-            let str1 = "個別計算結果："+String(Math.round(r1/combination_pt(deck,hand,pt)*1000000)/10000)+"％\n";
-            if (Math.pow(2,53)-1 >= combination_pt(deck,hand,pt)){
-              str1 = str1 + "（" + r1.toLocaleString() +" ／ "+combination_pt(deck,hand,pt).toLocaleString()+"通り）";
-            }
-            rows[m].querySelector('.output').innerText = str1;
+            outputCon('個別' + makeTopOutputMsg(msresult, deck, hand, pt), m);
           }else{
-            rows[m].querySelector('.output').innerText = '設定された条件は有効ではありません。';
+            outputCon('設定された条件は有効ではありません。', m);
           }
         }
       }else{
-        document.querySelector('#top_output > .output').innerText = 'エラー:\n有効な条件が設定されていません。';
-        let rows = document.querySelectorAll(".congroup");
-        for (m = 0, rlen = rows.length; m < rlen; m = (m+1)){
-          rows[m].querySelector('.output').innerText = '設定された条件は有効ではありません。';
-        }
+        outputTop('エラー:\n有効な条件が設定されていません。');
+        outputConAll('設定された条件は有効ではありません。');
       }
       condition_ex(deck, hand, cards, cnums, consource);
     }else{
-      document.querySelector('#top_output > .output').innerText = 'エラー:\n設定したカードの合計枚数が、デッキ枚数を超えています。';
-      let rows = document.querySelectorAll(".congroup");
-      for (m = 0, rlen = rows.length; m < rlen; m = (m+1)){
-        rows[m].querySelector('.output').innerText = '';
-      }
+      outputTop('エラー:\n設定したカードの合計枚数が、デッキ枚数を超えています。');
+      outputConAll('');
     }
   }else{
     if (deck < hand){
-      document.querySelector('#top_output > .output').innerText = 'エラー:\n手札の枚数がデッキ枚数を超えています。';
+      outputTop('エラー:\n手札の枚数がデッキ枚数を超えています。');
     }else{
-      document.querySelector('#top_output > .output').innerText = 'エラー:\nデッキまたは手札の枚数は0～255枚の範囲で設定してください。';
+      outputTop('エラー:\nデッキまたは手札の枚数は0～255枚の範囲で設定してください。');
     }
-    let rows = document.querySelectorAll(".congroup");
-    for (m = 0, rlen = rows.length; m < rlen; m = (m+1)){
-      rows[m].querySelector('.output').innerText = '';
-    }
+    outputConAll('');
   }
+  console.timeEnd('drawCalc');
 }
 
 function condition_ex(deck, hand, cards, cnums, consource){
   let cnames = [];
   let cng = document.querySelectorAll(".cardname");
-  for (let i = 0, cl = cng.length; i < cl; i = (i+1)){
+  for (let i = 0, cl = cng.length; i < cl; i += 1){
     cnames.push(cng[i].value);
   }
   let str = "xj=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(JSON.stringify([deck, hand, cards, cnames, cnums, consource]))));
@@ -782,6 +855,7 @@ function condition_in(){
     }else{
       str = convertConditionInBeta(queryParam.x);
     }
+    let dst = {};
     try {
       JSON.parse(str);
     } catch(e){
@@ -794,27 +868,27 @@ function condition_in(){
       document.getElementById('hand_n').value = dst[1];
       let cards = dst[2];
       let cs = cards.length;
-      for (let i = 0; i < cs; i = (i+1)){
+      for (let i = 0; i < cs; i += 1){
         addCard();
       }
       let cg = document.querySelectorAll(".card");
-      for (let i = 0; i < cs; i = (i+1)){
+      for (let i = 0; i < cs; i += 1){
         cg[i].querySelector(".cardname").value = dst[3][i];
         cg[i].querySelector(".cardnum").value = dst[4][i];      
       }
-      for (let j = 0; j < dst[5].length; j = (j+1)){
+      for (let j = 0; j < dst[5].length; j += 1){
         addConGroup();
-        for (let k = 1; k < dst[5][j].length; k = (k+1)){
+        for (let k = 1; k < dst[5][j].length; k += 1){
           addCon(j+1);
         }
       }
-      for (let j = 0; j < dst[5].length; j = (j+1)){
-        for (let k = 0; k < dst[5][j].length; k = (k+1)){
+      for (let j = 0; j < dst[5].length; j += 1){
+        for (let k = 0; k < dst[5][j].length; k += 1){
           let tcon = $con(j + 1, k + 1);
           tcon.querySelector(".condition_n").value = dst[5][j][k][1];
           selectsingle(tcon.querySelector('.condition_cs > .selectbox > [value="' + String(Math.floor(dst[5][j][k][2] / 4)) + '"]'))
           selectsingle(tcon.querySelector('.condition_m > .selectbox > [value="' + String(dst[5][j][k][2] % 4) + '"]'))
-          for (let s = 0; s < dst[5][j][k][0].length; s = (s+1)){
+          for (let s = 0; s < dst[5][j][k][0].length; s += 1){
             selectmulti(tcon.querySelector('.selectcondition > .selectbox > [value="'+(String(cards.indexOf(dst[5][j][k][0][s]) + 1))+'"]'));
           }
         }
@@ -894,3 +968,4 @@ function convertConditionInBeta(x){
 
 //イベントハンドラ
 document.addEventListener('DOMContentLoaded', condition_in);
+document.addEventListener('DOMContentLoaded', function (){document.getElementById('version').innerText = 'ver.' + version;});

@@ -218,6 +218,10 @@ label{
   border-radius: 0.9375em;
   display: flex;
   flex-direction: row;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 0.9375em;
+  border-bottom-left-radius: 0.9375em;
 }
 .conbase {
   width: 13.5em;
@@ -265,7 +269,7 @@ label{
 }
 .addconwrap {
   background: #fff;
-  transform: translateX(-2.635em) translateY(0em);
+  /*! transform: translateX(-2.635em) translateY(0em); */
   width: 2.635em;
   z-index: 4;
 }
@@ -626,10 +630,15 @@ footer, footer > * {
   .congroup {
     flex-direction: column;
     height: auto;
+    margin-bottom: 1em;
   }
   .congroupinner {
     width: 100%;
     flex-direction: column;
+    border-top-left-radius: 0.9375em;
+    border-top-right-radius: 0.9375em;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
   }
   .andblock {
     width: auto;
@@ -690,9 +699,10 @@ footer, footer > * {
     flex-direction: row;
   }
   .addconwrap {
-    width: calc(100% + 0.25em);
+    width: calc(100% + 0.3125em);
     height: 2.625em;
-    transform: translateX(0em) translateY(-2.625em);
+    /*! transform: translateX(0em) translateY(-2.625em); */
+    /*! border: 2px solid #64d8cc; */
   }
   .addcon {
     width: 100%;
@@ -738,7 +748,7 @@ footer, footer > * {
   .chkcontent, .card, #addcard, #addcongroup, .congroupinner, #deckhandset, #top_result {
   }
   footer {
-    height: 7.5em;
+    height: 8.5em;
   }
   .chkcontent {
     font-size: 87.5%;
