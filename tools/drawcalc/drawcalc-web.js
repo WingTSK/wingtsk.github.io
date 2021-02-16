@@ -754,7 +754,7 @@ function twttr(id, obj){
     if (keys.length > 0) str = `${str}${ary.join('&')}`;
   }
   let t = document.getElementById(id);
-  t.innerHTML = `<div id="twitter"><div class="btn-o" data-scribe="component:button" style="width: 61px;"><a href="${str}" class="twbtn"><span class="twlogo"></span><span class="twlabel">Tweet</span></a></div></div>`;
+  t.innerHTML = `<div id="twitter"><div class="btn-o" data-scribe="component:button" style="width: 61px;"><a href="${str}" target="_blank" class="twbtn"><span class="twlogo"></span><span class="twlabel">Tweet</span></a></div></div>`;
 }
 
 document.addEventListener('DOMContentLoaded', drawcalc.web.start);
