@@ -7,7 +7,7 @@
   <link rel="stylesheet" type="text/css" href="./drawcalc.css">
   <link rel="icon" href="https://wingtsk.github.io/favicon.ico">
   <link rel="apple-touch-icon" href="./img/drawcalc-icon.png">
-  <script type="text/javascript" src="./drawcalc-pwa.js"></script>
+  <!-- script type="text/javascript" src="./drawcalc-pwa.js"></script -->
   <link rel="manifest" href="./drawcalc.json">
 
   <!--Facebook Start-->
@@ -154,14 +154,19 @@
       例５：の場合、２つの条件を合わせると"２枚ちょうどドロー"となりそうですが、それぞれで設定した"１枚ちょうどドロー"を満たすことができなくなるため、このような結果となります。）<br>
       </div>
     </div>
-    <br>
-    <div class="chkmenu">
-      <input type="checkbox" class="checkbox" id="checkbox3" style="display: none;"><label for="checkbox3"><span class="chkarrow">▼</span> キャッシュ設定（クリックで<span class="chktxt">表示</span>）</label>
+    <br id="swbefore" style="display: none;">
+    <div id="swmenu" class="chkmenu" style="display: none;">
+      <input type="checkbox" class="checkbox" id="checkbox3" style="display: none;"><label for="checkbox3"><span class="chkarrow">▼</span> Service Worker設定（クリックで<span class="chktxt">表示</span>）</label>
       <div class="chkcontent" id="chkcontent3">
-      ●キャッシュの消去<br>
-      このページのキャッシュを消去する場合は下のボタンを押してください。<br>
-      <input type="button" value="キャッシュ消去" onclick='clearCaches();'>
-      <div id="clearcachesmsg"></div>
+      ●Service Worker開始<br>
+      このページのService Workerを稼働させる場合は下のボタンを押してください。<br>
+      <input type="button" value="稼働" onclick='serviceWorkerOn();'>
+      <div id="swmsg1"></div>
+      <br>
+      ●Service Worker停止<br>
+      このページのService Workerを停止する場合は下のボタンを押してください。<br>
+      <input type="button" value="停止" onclick='serviceWorkerOff();'>
+      <div id="swmsg2"></div>
       </div>
     </div>
     <p>

@@ -4,7 +4,6 @@ var urlsToCache = [
   './index.html',
   './drawcalc.js',
   './drawcalc-web.js',
-  './drawcalc-pwa.js',
   './drawcalc-sw.js',
   './drawcalc.css',
   './img/drawcalc-icon.png',

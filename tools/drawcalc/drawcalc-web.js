@@ -756,11 +756,27 @@ function twttr(id, obj){
   let t = document.getElementById(id);
   t.innerHTML = `<div id="twitter"><div class="btn-o" data-scribe="component:button" style="width: 61px;"><a href="${str}" target="_blank" class="twbtn"><span class="twlogo"></span><span class="twlabel">Tweet</span></a></div></div>`;
 }
+function serviceWorkerOn (){
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./drawcalc-sw.js')
+      .then(function(registration) {
+        console.log('Service worker registration succeeded:', registration);
+        document.querySelector('#swmsg1').innerText = 'Service Workerが稼働しました';
+      }, function(error) {
+        console.log('Service worker registration failed:', error);
+        document.querySelector('#swmsg1').innerText = 'エラーが発生し、稼働しませんでした';
+      });
+  } else {
+    console.log('Service workers are not supported.');
+  }
+}
 
-function clearCaches(){
+function serviceWorkerOff(){
+  let n = 0;
   navigator.serviceWorker.getRegistrations().then(function (registrations){
     for (let registration of registrations){
       registration.unregister();
+      n += 1;
     }
   });
   caches.keys().then(function (keys){
@@ -771,7 +787,11 @@ function clearCaches(){
         }
     });
   });
-  document.querySelector('#clearcachesmsg').innerText = '消去しました';
+  if (n > 0){
+    document.querySelector('#swmsg2').innerText = 'Service Workerを停止しました';
+  }else{
+    document.querySelector('#swmsg2').innerText = 'Service Workerは稼働していませんでした';
+  }
 }
 
 document.addEventListener('DOMContentLoaded', drawcalc.web.start);
@@ -782,4 +802,8 @@ document.addEventListener('DOMContentLoaded',function (){
   document.getElementById('deck_n').addEventListener('change',drawcalc.web.updateDeckNum); 
   document.getElementById('hand_n').addEventListener('change',drawcalc.web.updateHandNum);
   document.querySelector('body').addEventListener('click',menuJS.close);
+  if ('serviceWorker' in navigator){
+    document.getElementById('swbefore').style.display = '';
+    document.getElementById('swmenu').style.display = 'block';
+  }
 });
