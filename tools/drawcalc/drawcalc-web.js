@@ -772,11 +772,9 @@ function serviceWorkerOn (){
 }
 
 function serviceWorkerOff(){
-  let n = 0;
   navigator.serviceWorker.getRegistrations().then(function (registrations){
     for (let registration of registrations){
       registration.unregister();
-      n += 1;
     }
   });
   caches.keys().then(function (keys){
@@ -787,11 +785,7 @@ function serviceWorkerOff(){
         }
     });
   });
-  if (n > 0){
-    document.querySelector('#swmsg2').innerText = 'Service Workerを停止しました';
-  }else{
-    document.querySelector('#swmsg2').innerText = 'Service Workerは稼働していませんでした';
-  }
+  document.querySelector('#swmsg2').innerText = 'Service Workerを停止しました';
 }
 
 document.addEventListener('DOMContentLoaded', drawcalc.web.start);
