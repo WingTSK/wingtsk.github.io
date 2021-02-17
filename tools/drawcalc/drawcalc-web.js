@@ -757,6 +757,23 @@ function twttr(id, obj){
   t.innerHTML = `<div id="twitter"><div class="btn-o" data-scribe="component:button" style="width: 61px;"><a href="${str}" target="_blank" class="twbtn"><span class="twlogo"></span><span class="twlabel">Tweet</span></a></div></div>`;
 }
 
+function clearCaches(){
+  navigator.serviceWorker.getRegistrations().then(function (registrations){
+    for (let registration of registrations){
+      registration.unregister();
+    }
+  });
+  caches.keys().then(function (keys){
+    var promises = [];
+    keys.forEach(function (cacheName){
+        if (cacheName){
+          promises.push(caches.delete(cacheName));
+        }
+    });
+  });
+  document.querySelector('#clearcachesmsg').innerText = '消去しました';
+}
+
 document.addEventListener('DOMContentLoaded', drawcalc.web.start);
 document.addEventListener('DOMContentLoaded', function (){
   document.getElementById('version').innerText = drawcalc.version();

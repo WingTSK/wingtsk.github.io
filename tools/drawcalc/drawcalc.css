@@ -5,7 +5,14 @@ body {
 }
 
 body * {
-  font-family: 'Meiryo','メイリオ','Hiragino Kaku Gothic ProN','ヒラギノ角ゴ ProN W3',sans-serif;
+  font-family:
+    'Meiryo',
+    'メイリオ',
+    'Hiragino Kaku Gothic ProN',
+    'ヒラギノ角ゴ ProN W3',
+    'Roboto',
+    'Noto Sans CJK JP',
+    sans-serif;
 }
 #cardset {
   margin: 0.125em;
