@@ -765,8 +765,8 @@ function serviceWorkerCheck(){
       document.getElementById('swonbuttoff').removeAttribute('disabled','');
     }else{
       document.getElementById('swmsg0').innerText = 'このページのService Workerは登録されていません。';
-      document.getElementById('swonbutton').setAttribute('disabled','');
-      document.getElementById('swonbuttoff').removeAttribute('disabled','');
+      document.getElementById('swonbutton').removeAttribute('disabled','');
+      document.getElementById('swonbuttoff').setAttribute('disabled','');
     }
   }else{
     document.getElementById('swmsg0').innerText = 'Service Workerはサポートされていません。';
