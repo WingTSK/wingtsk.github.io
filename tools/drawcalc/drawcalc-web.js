@@ -762,11 +762,11 @@ function serviceWorkerCheck(){
     if (navigator.serviceWorker.controller){
       document.getElementById('swmsg0').innerText = 'このページのService Workerは登録されています。';
       document.getElementById('swonbutton').setAttribute('disabled','');
-      document.getElementById('swonbuttoff').removeAttribute('disabled','');
+      document.getElementById('swoffbutton').removeAttribute('disabled','');
     }else{
       document.getElementById('swmsg0').innerText = 'このページのService Workerは登録されていません。';
       document.getElementById('swonbutton').removeAttribute('disabled','');
-      document.getElementById('swonbuttoff').setAttribute('disabled','');
+      document.getElementById('swoffbutton').setAttribute('disabled','');
     }
   }else{
     document.getElementById('swmsg0').innerText = 'Service Workerはサポートされていません。';
@@ -781,7 +781,7 @@ function serviceWorkerOn (){
         document.getElementById('swmsg1').innerText = 'Service Workerが登録しました。';
         document.getElementById('swmsg0').innerText = 'このページのService Workerは登録されています。';
         document.getElementById('swonbutton').setAttribute('disabled','');
-        document.getElementById('swonbuttoff').removeAttribute('disabled','');
+        document.getElementById('swoffbutton').removeAttribute('disabled','');
       }, function(error) {
         console.log('Service worker registration failed:', error);
         document.getElementById('swmsg1').innerText = 'エラーが発生し、登録されませんでした。';
