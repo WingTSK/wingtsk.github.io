@@ -10,7 +10,7 @@
   'use strict';
   
   const PRODUCT = 'drawcalc';
-  const VERSION = '0.5 rc6';
+  const VERSION = '0.5 rc7';
   const AUTHOR = 'WingTSK';
   
   if (!root[PRODUCT]) root[PRODUCT] = {};

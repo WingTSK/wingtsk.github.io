@@ -760,7 +760,7 @@ function twttr(id, obj){
 function serviceWorkerCheck(){
   if ('serviceWorker' in navigator){
     if (navigator.serviceWorker.controller){
-      document.getElementById('swmsg0').innerText = 'このページのService Workerは登録されています。';
+      document.getElementById('swmsg0').innerText = 'このページのService Workerは登録済みです。';
       document.getElementById('swonbutton').setAttribute('disabled','');
       document.getElementById('swoffbutton').removeAttribute('disabled','');
     }else{
@@ -778,8 +778,8 @@ function serviceWorkerOn (){
     navigator.serviceWorker.register('./drawcalc-sw.js')
       .then(function(registration) {
         console.log('Service worker registration succeeded:', registration);
-        document.getElementById('swmsg1').innerText = 'Service Workerが登録しました。';
-        document.getElementById('swmsg0').innerText = 'このページのService Workerは登録されています。';
+        document.getElementById('swmsg1').innerText = 'Service Workerを登録しました。';
+        document.getElementById('swmsg0').innerText = 'このページのService Workerは登録済みです。';
         document.getElementById('swonbutton').setAttribute('disabled','');
         document.getElementById('swoffbutton').removeAttribute('disabled','');
       }, function(error) {
@@ -807,7 +807,9 @@ function serviceWorkerOff(){
       });
     });
     document.getElementById('swmsg2').innerText = 'Service Workerを停止しました。';
-    serviceWorkerCheck();
+    document.getElementById('swmsg0').innerText = 'このページのService Workerは登録されていません。';
+    document.getElementById('swonbutton').removeAttribute('disabled','');
+    document.getElementById('swoffbutton').setAttribute('disabled','');
   } else {
     console.log('Service workers are not supported.');
   }
