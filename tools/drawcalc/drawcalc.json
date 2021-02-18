@@ -1,7 +1,7 @@
 {
   "name": "ドロー確率計算機",
   "short_name": "DrawCalc",
-  "description": "初手計算など、トレーディングカードゲームで特定のカードや組み合わせをドローできる確率を計算できます。",
+  "description": "カードゲームでの特定のカードや組み合わせをドローできる確率を計算できます。条件が複数パターンある場合にも対応しています。",
   "background_color": "#ffffff",
   "theme_color": "#64d8cc",
   "icons": [{

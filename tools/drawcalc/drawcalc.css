@@ -511,6 +511,7 @@ footer, footer > * {
   margin-top: 0.0625em;
   margin-left: auto;
   margin-right: 0.5em;
+  font: normal normal normal 11px/18px 'Helvetica Neue',Arial,sans-serif;
 }
 #top_output > span {
   margin: 0.5em;
@@ -605,7 +606,7 @@ footer, footer > * {
 
 .twlogo {
   position: relative;
-  top: 0px;
+  top: 3px;
   display: inline-block;
   width: 14px;
   height: 14px;
@@ -812,9 +813,9 @@ footer, footer > * {
     margin-top: 0em;
     margin-left: 0.0625em;
   }
-  .twlogo {
+  /*.twlogo {
     top: 2px;
-  }
+  }*/
 }
 @media screen and (max-width: 384px){
   body {font-size: 87.5%;}
