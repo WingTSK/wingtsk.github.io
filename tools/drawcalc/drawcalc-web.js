@@ -758,7 +758,7 @@ function twttr(id, obj){
 }
 function serviceWorkerOn (){
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./drawcalc-sw.js')
+    navigator.serviceWorker.register('./drawcalc-sw.js', {scope: './'})
       .then(function(registration) {
         console.log('Service worker registration succeeded:', registration);
         document.querySelector('#swmsg1').innerText = 'Service Workerが稼働しました';
