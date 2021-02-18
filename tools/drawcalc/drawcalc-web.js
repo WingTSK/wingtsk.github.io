@@ -756,15 +756,35 @@ function twttr(id, obj){
   let t = document.getElementById(id);
   t.innerHTML = `<div id="twitter"><div class="btn-o" data-scribe="component:button" style="width: 61px;"><a href="${str}" target="_blank" class="twbtn"><span class="twlogo"></span><span class="twlabel">Tweet</span></a></div></div>`;
 }
+
+function serviceWorkerCheck(){
+  if ('serviceWorker' in navigator){
+    if (navigator.serviceWorker.controller){
+      document.getElementById('swmsg0').innerText = 'このページのService Workerは登録されています。';
+      document.getElementById('swonbutton').setAttribute('disabled','');
+      document.getElementById('swonbuttoff').removeAttribute('disabled','');
+    }else{
+      document.getElementById('swmsg0').innerText = 'このページのService Workerは登録されていません。';
+      document.getElementById('swonbutton').setAttribute('disabled','');
+      document.getElementById('swonbuttoff').removeAttribute('disabled','');
+    }
+  }else{
+    document.getElementById('swmsg0').innerText = 'Service Workerはサポートされていません。';
+  }
+}
+
 function serviceWorkerOn (){
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./drawcalc-sw.js', {scope: './'})
+    navigator.serviceWorker.register('./drawcalc-sw.js')
       .then(function(registration) {
         console.log('Service worker registration succeeded:', registration);
-        document.querySelector('#swmsg1').innerText = 'Service Workerが稼働しました';
+        document.getElementById('swmsg1').innerText = 'Service Workerが登録しました。';
+        document.getElementById('swmsg0').innerText = 'このページのService Workerは登録されています。';
+        document.getElementById('swonbutton').setAttribute('disabled','');
+        document.getElementById('swonbuttoff').removeAttribute('disabled','');
       }, function(error) {
         console.log('Service worker registration failed:', error);
-        document.querySelector('#swmsg1').innerText = 'エラーが発生し、稼働しませんでした';
+        document.getElementById('swmsg1').innerText = 'エラーが発生し、登録されませんでした。';
       });
   } else {
     console.log('Service workers are not supported.');
@@ -772,20 +792,25 @@ function serviceWorkerOn (){
 }
 
 function serviceWorkerOff(){
-  navigator.serviceWorker.getRegistrations().then(function (registrations){
-    for (let registration of registrations){
-      registration.unregister();
-    }
-  });
-  caches.keys().then(function (keys){
-    var promises = [];
-    keys.forEach(function (cacheName){
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function (registrations){
+      for (let registration of registrations){
+        registration.unregister();
+      }
+    });
+    caches.keys().then(function (keys){
+      var promises = [];
+      keys.forEach(function (cacheName){
         if (cacheName){
           promises.push(caches.delete(cacheName));
         }
+      });
     });
-  });
-  document.querySelector('#swmsg2').innerText = 'Service Workerを停止しました';
+    document.getElementById('swmsg2').innerText = 'Service Workerを停止しました。';
+    serviceWorkerCheck();
+  } else {
+    console.log('Service workers are not supported.');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', drawcalc.web.start);
@@ -799,5 +824,6 @@ document.addEventListener('DOMContentLoaded',function (){
   if ('serviceWorker' in navigator){
     document.getElementById('swbefore').style.display = '';
     document.getElementById('swmenu').style.display = 'block';
+    serviceWorkerCheck();
   }
 });
