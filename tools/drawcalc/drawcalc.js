@@ -3,14 +3,14 @@
  * 
  * drawcalc.js
  *
- * drawcalc ver.0.5.0 2021-02-12
+ * drawcalc ver.0.5 rc8 2021-07-27
  */
 
 (function (root){
   'use strict';
   
   const PRODUCT = 'drawcalc';
-  const VERSION = '0.5 rc7';
+  const VERSION = '0.5 rc8';
   const AUTHOR = 'WingTSK';
   
   if (!root[PRODUCT]) root[PRODUCT] = {};
@@ -41,11 +41,29 @@
     const CODE_ERROR_HAND_MORE_THAN_DECK = 402;
     const CODE_ERROR_HAND_MINUS = 403;
     const CODE_ERROR_SETCARDS_OVER_DECK = 404;
+    const CODE_ERROR_ILLEGAL_DECK = 405;
+    const CODE_ERROR_ILLEGAL_HAND = 406;
         
     const version = function (){
       return `${PRODUCT} ver.${VERSION}`;
     }
     
+    const chkUpdate = function(){    
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', './version.json', true);
+      xhr.onload = function(e){
+        if(xhr.status == 200){
+          let item = JSON.parse(xhr.response);
+          if (item.version === VERSION){
+            console.log('This is latest version.');
+          }else{
+            console.log('This is not latest version.');
+          }
+        }
+      };
+      xhr.send();
+    }
+
     const getNewCardId = function (){
       const len = obj.cards.length;
       if (len === 0){
@@ -254,10 +272,11 @@
 
     const chkPattern = function (coordinate, condition){
       let len = condition.length;
-      let t = 0, tc = 1;
+      let t = 0;
+      let tc = 1;
       for (let i = 0; i < len && t === 0; i += 1){
         tc = 1;
-        for (let j = 0, jl = condition[i].length; j < jl && tc === 1; j += 1){
+        for (let j = 0, k = condition[i].length; j < k && tc === 1; j += 1){
           if (coordinate[j] < condition[i][j][0] || coordinate[j] > condition[i][j][1]){
             tc = 0;
           }
@@ -568,19 +587,40 @@
     
     const calc = function(deck, hand, cards, conditions){
       let code = CODE_OK;
-      if (deck > DEFAULT_DECK_LIMIT) code = CODE_ERROR_DECK_OVER_LIMIT;
-      if (hand > deck) code = CODE_ERROR_HAND_MORE_THAN_DECK;
-      if (hand < 0) code = CODE_ERROR_HAND_MINUS;
-      if (sumArray(makeCardsNums(cards)) > deck) code = CODE_ERROR_SETCARDS_OVER_DECK;
+      if (deck !== (deck|0)){
+        code = CODE_ERROR_ILLEGAL_DECK;
+        return {code : code};
+      }
+      if (hand !== (hand|0)){
+        code = CODE_ERROR_ILLEGAL_HAND;
+        return {code : code};
+      }
+      if (deck > DEFAULT_DECK_LIMIT){
+        code = CODE_ERROR_DECK_OVER_LIMIT;
+        return {code : code};
+      }
+      if (hand > deck){
+        code = CODE_ERROR_HAND_MORE_THAN_DECK;
+        return {code : code};
+      }
+      if (hand < 0){
+        code = CODE_ERROR_HAND_MINUS;
+        return {code : code};
+      }
+      if (sumArray(makeCardsNums(cards)) > deck){
+        code = CODE_ERROR_SETCARDS_OVER_DECK;
+        return {code : code};
+      }
       const base = makeBase(cards, conditions);
       const cnums = base.map(function(x){
               return sumArray(makeGroupNums(x, makeCardsIds(cards), makeCardsNums(cards)));
             });
       const condition = makeCondition(cards, conditions, base);      
-      if (condition.length === 0) code = CODE_ERROR_ILLEGAL_CONDITION;
-   
+      if (condition.length === 0){
+        code = CODE_ERROR_ILLEGAL_CONDITION;
+        return {code : code};
+      }
       if (code === CODE_OK){
-                
         /* 組み合わせ計算用のメモの構築 */
         if (!obj.pt[deck]) obj.pt = pascalTriangle(deck);
 
@@ -647,6 +687,7 @@
     obj.setConIds = setConIds;
     obj.setConMode = setConMode;
     obj.setConNum = setConNum;
+    obj.chkUpdate = chkUpdate;
     /*  */
     
   })(root[PRODUCT]);

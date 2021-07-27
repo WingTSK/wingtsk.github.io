@@ -1,4 +1,4 @@
-var CACHE_NAME = 'pwa-drawcalc-caches';
+var CACHE_NAME = 'pwa-drawcalc-0.5-rc8';
 var urlsToCache = [
   './',
   './index.html',

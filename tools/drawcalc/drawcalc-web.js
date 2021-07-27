@@ -3,14 +3,14 @@
  * 
  * drawcalc-web.js
  *
- * ドロー確率計算機 ver.0.5.0 2021-02-12
+ * ドロー確率計算機 ver.0.5 rc8 2021-07-27
  */
 
 (function (root){
   "use strict";
   
   const PRODUCT = 'drawcalc';
-  const VERSION = '0.5.0';
+  const VERSION = '0.5 rc8';
   const MODULE = 'web';
   const AUTHOR = 'WingTSK';
   
@@ -45,7 +45,12 @@
     const CODE_ERROR_HAND_MORE_THAN_DECK = 402;
     const CODE_ERROR_HAND_MINUS = 403;
     const CODE_ERROR_SETCARDS_OVER_DECK = 404;
+    const CODE_ERROR_ILLEGAL_DECK = 405;
+    const CODE_ERROR_ILLEGAL_HAND = 406;
     
+    const version = function (){
+      return `${PRODUCT}-${MODULE} ver.${VERSION}`;
+    }
     
     const getPersent = function (p, n){
       if (Number(p) === p && Number(n) === n){
@@ -326,16 +331,6 @@
       }
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     const importDeck = function (n){
       document.getElementById('deck_n').value = n;
       updateDeckNum();
@@ -370,16 +365,15 @@
           addCon(j + 1);
         }
       }
-
       for (let j = 0; j < conditions.length; j += 1){
         for (let k = 0; k < conditions[j].length; k += 1){
-          const cgid = j + 1,
-                conid = k + 1,
-                ids = new Array(conditions[j][k][0].length).fill().map(function (_, s){
+          const cgid = j + 1;
+          const conid = k + 1;
+          const ids = new Array(conditions[j][k][0].length).fill().map(function (_, s){
                   return cids.indexOf(conditions[j][k][0][s]) + 1;
-                }),
-                num = Number(conditions[j][k][1]),
-                mode = Number(conditions[j][k][2]);
+                });
+          const num = Number(conditions[j][k][1]);
+          const mode = Number(conditions[j][k][2]);
                 
           let target = document.querySelector('[cgid="' + cgid + '"]').querySelector('[conid="' + conid + '"]');
           target.querySelector(".condition_n").value = num;
@@ -498,6 +492,12 @@
         if (main.code === CODE_ERROR_ILLEGAL_CONDITION){
           outputTop('エラー:\n有効な条件が設定されていません。');
           outputConAll('設定された条件は有効ではありません。');
+        }else if (main.code === CODE_ERROR_ILLEGAL_DECK){
+          outputTop('エラー:\nデッキ枚数に不正な値が設定されています。');
+          outputConAll('');
+        }else if (main.code === CODE_ERROR_ILLEGAL_HAND){
+          outputTop('エラー:\n手札枚数に不正な値が設定されています。');
+          outputConAll('');
         }else if (main.code === CODE_ERROR_SETCARDS_OVER_DECK){
           outputTop('エラー:\n設定したカードの合計枚数が、デッキ枚数を超えています。');
           outputConAll('');
@@ -521,7 +521,8 @@
     
     //getPersent//
     //resultMsg//
-    
+    obj[MODULE].version = version;
+
     obj[MODULE].addCard = addCard;
     obj[MODULE].deleteCard = deleteCard;
     obj[MODULE].addCon = addCon;
@@ -775,7 +776,7 @@ function serviceWorkerCheck(){
 
 function serviceWorkerOn (){
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./drawcalc-sw.js')
+    navigator.serviceWorker.register('./drawcalc-sw.js', {scope: '/tools/drawcalc'})
       .then(function(registration) {
         console.log('Service worker registration succeeded:', registration);
         document.getElementById('swmsg1').innerText = 'Service Workerを登録しました。';
@@ -801,7 +802,7 @@ function serviceWorkerOff(){
     caches.keys().then(function (keys){
       var promises = [];
       keys.forEach(function (cacheName){
-        if (cacheName){
+        if (cacheName.indexOf('pwa-drawcalc') === 0){
           promises.push(caches.delete(cacheName));
         }
       });
@@ -817,7 +818,8 @@ function serviceWorkerOff(){
 
 document.addEventListener('DOMContentLoaded', drawcalc.web.start);
 document.addEventListener('DOMContentLoaded', function (){
-  document.getElementById('version').innerText = drawcalc.version();
+  document.getElementById('version').innerText = drawcalc.web.version();
+  drawcalc.chkUpdate();
 });
 document.addEventListener('DOMContentLoaded',function (){
   document.getElementById('deck_n').addEventListener('change',drawcalc.web.updateDeckNum); 
