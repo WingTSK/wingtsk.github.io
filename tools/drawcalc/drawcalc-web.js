@@ -776,7 +776,7 @@ function serviceWorkerCheck(){
 
 function serviceWorkerOn (){
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./drawcalc-sw.js', {scope: '/tools/drawcalc'})
+    navigator.serviceWorker.register('./drawcalc-sw.js')
       .then(function(registration) {
         console.log('Service worker registration succeeded:', registration);
         document.getElementById('swmsg1').innerText = 'Service Workerを登録しました。';
