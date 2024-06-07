@@ -1,9 +1,9 @@
 /*
  * Copyright (c) 2020 WingTSK
  * 
- * kinkenn.js */ version = '0.0.6 Beta'; /* 2020-11-08
+ * kinkenn.js */ version = '0.0.7 Beta'; /* 2024-06-07
  * 
- * Based on draw-calculator.js ver.0.3.1
+ * Based on draw-calculator.js ver.0.3.2
  */
 
 let cards_counter = [];
@@ -886,7 +886,7 @@ function condition_ex(deck, hand, cards, cnums, consource){
     cnames.push(cng[i].value);
   }
   let str = "kn=" + kn + "&kc=" + kc + "&xj=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(JSON.stringify([deck, hand, cards, cnames, cnums, consource]))));
-  let url = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + str;
+  let url = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + str + "#";
   document.querySelector("#export_box").value = url;
   if (document.querySelector("#tweet-area").children.length > 0){
     document.querySelector("#tweet-area").innerHTML="";
