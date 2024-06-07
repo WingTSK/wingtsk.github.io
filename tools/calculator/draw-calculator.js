@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2020 WingTSK
+ * Copyright (c) 2020-2024 WingTSK
  * 
- * draw-calculator.js */version = '0.3.1'; /* 2020-11-08
+ * draw-calculator.js */version = '0.3.2'; /* 2024-06-07
  */
 
 let cards_counter = [];
@@ -836,7 +836,7 @@ function condition_ex(deck, hand, cards, cnums, consource){
     cnames.push(cng[i].value);
   }
   let str = "xj=" + Base64.toBase64(RawDeflate.deflate(Base64.utob(JSON.stringify([deck, hand, cards, cnames, cnums, consource]))));
-  let url = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + str;
+  let url = location.href.replace(/\#.*$/, '').replace(/\?.*$/, '') + "?" + str +"#";
   document.querySelector("#export_box").value = url;
   if (document.querySelector("#tweet-area").children.length > 0){
     document.querySelector("#tweet-area").innerHTML="";
