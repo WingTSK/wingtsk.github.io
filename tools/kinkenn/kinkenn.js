@@ -1,9 +1,9 @@
 /*
  * Copyright (c) 2020 WingTSK
  * 
- * kinkenn.js */ version = '0.0.7 Beta'; /* 2024-06-07
- * 
- * Based on draw-calculator.js ver.0.3.2
+ * kinkenn.js */ version = '0.0.7.1 Beta'; /* 2024-06-28
+ *
+ * Based on draw-calculator.js ver.0.3.2.1
  */
 
 let cards_counter = [];
@@ -514,7 +514,7 @@ function addCon(num){
     let clist = ('');
     for (let i = 0; i < cards_counter.length; i += 1){
       let ci = String(cards_counter[i]);
-      let cn = $cid(ci).querySelector('.cardname').value
+      let cn = $cid(ci).querySelector('.cardname').value.replace(/[<>&"]/g, char=>({'<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;'})[char]);
       clist = clist + '<li checked="0" onclick="selectmulti(this)" value="' + ci + '">' + cn + '</li>';
     }
     newcon.innerHTML = [
