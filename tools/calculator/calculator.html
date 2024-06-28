@@ -1,17 +1,171 @@
 <!DOCTYPE html>
-<html lang="ja" prefix="og: http://ogp.me/ns#">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
-  <title>メンテナンス中</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,user-scalable=no">
+  <title>ドロー確率計算機｜WingTSK's Project</title>
+  <link rel="stylesheet" type="text/css" href="./draw-calculator.css?20201106">
+  
+  <link rel="icon" href="https://wingtsk.github.io/favicon.ico">
+  <link rel="apple-touch-icon" href="https://wingtsk.github.io/tools/calculator/img/draw-calculator.png">
+  
+  <!--Facebook Start-->
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="WingTSK's Project">
+  <meta property="og:title" content="ドロー確率計算機｜WingTSK's Project">
+  <meta property="og:description" content="カードゲームで特定のカードや組み合わせをドローできる確率を計算できます。条件が複数ある場合にも対応しています。">
+  <meta property="og:image" content="https://wingtsk.github.io/tools/calculator/img/draw-calculator-ogp.png">
+  <meta property="og:url" content="https://wingtsk.github.io/tools/calculator/calculator.html">
+  <!--Facebook End-->
+  
+  <!--Twitter Card Start-->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@WingTSK">
+  <meta name="twitter:title" content="ドロー確率計算機｜WingTSK's Project">
+  <meta name="twitter:description" content="カードゲームで特定のカードや組み合わせをドローできる確率を計算できます。条件が複数ある場合にも対応しています。">
+  <meta name="twitter:image" content="https://wingtsk.github.io/tools/calculator/img/draw-calculator.png">
+  <meta name="twitter:url" content="https://wingtsk.github.io/tools/calculator/calculator.html">
+  <!--Twitter Card End-->
 </head>
-<body>
-<h1>
-メンテナンス中
-</h1>
-<p>
-現在、ドロー確率計算機はメンテナンス中です。<br>
-メンテナンス期間：2024-06-28 07:10頃 ～ 未定
-</p>
+<body onclick="menuclose()">
+  <script type="text/javascript" src="./draw-calculator.js?ver=0.3.1"></script>
+  <script type="text/javascript" src="../../external/js/rawdeflate.js"></script>
+  <script type="text/javascript" src="../../external/js/rawinflate.js"></script>
+  <script type="text/javascript" src="../../external/js/base64.js"></script>
+  <script type="text/javascript" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  <div id="main">
+    <h1><a href="./calculator.html">ドロー確率計算機</a></h1>
+    <p>遊戯王OCGの初手計算など、トレーディングカードゲームで特定のカードや組み合わせをドローできる確率を計算できます。<br>条件が複数ある場合にも対応しています。</p>
+    <p>「金満で謙虚な壺」を使用したデッキに対応したバージョンは<a href="https://wingtsk.github.io/tools/kinkenn/kinkenn.html">コチラ</a></p>
+    <form name="calculator" autocomplete="on">
+    <div id="calc">
+      <div id="mainset">
+        <div id="deckhandset">
+          <div>基本設定:</div>
+          <div>
+            デッキ枚数:
+            <input type="number" name="deck" id="deck_n" required="required" value="40" min="0" max="255" placeholder="デッキ枚数" onclick="this.select();">枚
+          </div>
+          <div>
+            手札枚数:
+            <input type="number" name="hand" id="hand_n" required="required" value="5" min="0" max="255" placeholder="手札枚数" onclick="this.select();">枚
+          </div>
+        </div>
+        <div id="top_result">
+          <div id="top_output">
+            <div class="output">条件を入力後、電卓マークのボタンを押してください。<br>計算結果はここに表示されます。</div>
+          </div>
+          <div id="result_buttons">
+            <div>
+              <input type="text" name="export_box" id="export_box" style="width: 1px; height: 0px; border: solid 0px; padding: 0px;" readonly>
+              <input type="button" value="URLをコピー" onclick='copyToClipboard("#export_box");'>
+            </div>
+            <div id="tweet-area">
+              <!--Twitter-->
+            </div>
+          </div>
+        </div>
+        <div id="top_calc" onclick="drawCalc()" title="計算！">
+          <div class="drawcalculator"><div></div></div> 
+        </div>
+      </div>
+      <br>
+      <div id="cardset">
+        <input type="checkbox" class="checkflexbox checkbox" id="checkcardset" style="display: none;" checked><label for="checkcardset"><span class="chkarrow">▼</span>カード枚数設定（クリックで<span class="chktxt">表示</span>）</label>
+        <div id="cardsetbox"  class="chkflexcontent">
+          <div id="addcard" class="addcard" onclick="addCard()" title="カードを追加">
+            <div class="addbtn"><div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div id="conset">
+        <input type="checkbox" class="checkflexbox checkbox" id="checkconset" style="display: none;" checked><label for="checkconset"><span class="chkarrow">▼</span>条件設定（クリックで<span class="chktxt">表示</span>）</label>
+        <div id="consetbox" class="chkflexcontent">
+          <div id="addcongroup" class="addcongroup" onclick="addConGroup()" title="パターンを追加">
+            <div class="addbtn"><div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </form>
+    <br>
+    <div class="chkmenu">
+      <input type="checkbox" class="checkbox" id="checkbox1" style="display: none;"><label for="checkbox1"><span class="chkarrow">▼</span> 使い方（クリックで<span class="chktxt">表示</span>）</label>
+      <div class="chkcontent" id="chkcontent1">
+      「基本設定：」では、デッキ（山札）の枚数と、引いている手札の枚数を設定します。<br><br>
+      「カード枚数設定:」では、カード名と、そのカードをデッキに投入している枚数を設定します。<br>
+      設定するカードを増やす場合は、「カード枚数設定:」の一番最後の「＋」ボタンを押すことで、入力欄を増やすことができます。<br>
+      カード名は、デフォルトのままでも計算そのものに影響は与えませんが、設定しておくと条件設定の際にカードを選びやすくなるため、オススメです。<br><br>
+      「条件設定：」では、確率を計算したい手札のパターン（どのような引き方か）を設定します。<br>
+      １つのパターンに複数のカードに対して条件を設定したい場合は、そのパターンの端にある「＆」ボタンを押すことで、入力欄を増やすことができます。<br>
+      複数のパターンで計算したい場合は、「条件設定：」の一番最後の「＋」ボタンを押すことで、パターンを増やすことができます。<br>
+      </div>
+    </div>
+    <br>
+    <div class="chkmenu">
+      <input type="checkbox" class="checkbox" id="checkbox2" style="display: none;"><label for="checkbox2"><span class="chkarrow">▼</span> 条件の設定方法（クリックで<span class="chktxt">表示</span>）</label>
+      <div class="chkcontent" id="chkcontent2">
+      ●モードの設定<br>
+      条件モードは、<br>
+      ・（枚）以上ドロー<br>
+      ・（枚）ちょうどドロー<br>
+      ・（枚）以上デッキに残す<br>
+      ・（枚）ちょうどデッキに残す<br>
+      ・（種類）以上ドロー<br>
+      ・（種類）ちょうどドロー<br>
+      ・（種類）以上デッキに残す<br>
+      ・（種類）ちょうどデッキに残す<br>
+      これらの８種類から設定できます。確率を計算したい状況に合わせたモードを選んでください。<br><br>
+      ●「種類」モード<br>
+      ・「種類」モードでは、チェックを入れたカードの中から、指定の種類ドローしているかどうかで確率を計算します。<br>
+      ドローしている／していない（デッキに残っている／残っていない）で判定しているため、枚数の指定はできません。<br><br>
+      ●より複雑な条件を設定する場合<br>
+      ・一つの条件に複数のカードにチェックを入れて条件を設定した場合、それらのカードを一つのグループと見立てて確率を計算します。<br>
+      例１：「カード１」と「カード２」にチェックを入れ、"１枚ちょうどドロー"と設定した場合<br>
+      ⇒「カード１」と「カード２」の中から１枚ちょうどドローしているパターンの確率を求めます。<br>
+      （○：「カード１」を１枚ドローし、「カード２」をドローしないパターン）<br>
+      （○：「カード１」をドローせず、「カード２」を１枚ドローするパターン）<br>
+      （×：「カード１」を１枚ドローし、「カード２」も１枚ドローするパターン（合わせて２枚ドローしているため"１枚ちょうど"に該当しない））<br><br>
+      ・一つのパターンに複数の条件を設定した場合（＆で入力欄を増やした場合）、それぞれの条件の両方を満たす確率を計算します。<br>
+      例２：パターン１の１つ目の条件で"「カード１」を１枚以上ドロー"を、２つ目の条件で"「カード２」を１枚ちょうどドロー"を、それぞれ設定した場合<br>
+      ⇒「カード１」を１枚以上ドローし、かつ、「カード２」を１枚ちょうどドローする確率を求めます。<br>
+      （○：「カード１」を１枚ドローし、「カード２」を１枚ドローするパターン）<br>
+      （×：「カード１」をドローせず、「カード２」を１枚ドローするパターン）<br>
+      （×：「カード１」を１枚ドローし、「カード２」を２枚ドローするパターン）<br><br>
+      ・複数のパターンを設定した場合（＋でパターンを増やした場合）、それぞれのパターンのうち１つ以上を満たす確率を、全体の確率として計算します。<br>
+      例３：パターン１に"「カード１」を１枚以上ドロー"を、パターン２に"「カード２」を１枚ちょうどドロー"を、それぞれ設定した場合<br>
+      ⇒「カード１」を１枚以上ドローするか、「カード２」を１枚ちょうどドローする確率を求めます。<br>
+      （○：「カード１」を１枚ドローし、「カード２」をドローしないパターン（パターン１のみに該当））<br>
+      （○：「カード１」をドローせず、「カード２」を１枚ドローするパターン（パターン２のみに該当））<br>
+      （○：「カード１」を１枚ドローし、「カード２」も１枚ドローするパターン（両方のパターンに該当））<br><br>
+      ・一つのパターンに同じカードが複数回設定した場合、そのカードについては、それぞれの条件を合わせた新たな条件のように見立てて計算します（それぞれの条件も満たす必要があります）。<br>
+      例４：パターン１の１つ目の条件で"「カード１」を１枚以上ドロー"を、２つ目の条件でも"「カード１」を１枚以上ドロー"を、それぞれ設定した場合<br>
+      ⇒「カード１」を２枚以上ドローする確率を求めます。<br>
+      （○：「カード１」を２枚ドローするパターン）<br>
+      （×：「カード１」を１枚ドローするパターン）<br><br>
+      例５：パターン１の１つ目の条件で"「カード１」を１枚ちょうどドロー"を、２つ目の条件でも"「カード１」を１枚ちょうどドロー"を、それぞれ設定した場合<br>
+      ⇒該当なし（有効な条件としてはみなされません）<br>
+      （×：「カード１」を２枚ドローするパターン）<br>
+      （×：「カード１」を１枚ドローするパターン）<br>
+      例５：の場合、２つの条件を合わせると"２枚ちょうどドロー"となりそうですが、それぞれで設定した"１枚ちょうどドロー"を満たすことができなくなるため、このような結果となります。）<br>
+      </div>
+      <p>
+      <br>※このドロー確率計算機はjavascriptを使用しています。有効になっていない場合は動作しません。
+      <br>※初手計算の範囲を大幅に超えるような複雑な条件を設定した場合、計算に時間がかかる場合やフリーズする場合があります。
+      <br>※このドロー確率計算機を使用したことにより生じたいかなる損害に対しても、作者は責任を負わないものとします。
+      </p>
+    </div>
+    <div id="bottom_calc" class="drawcalculator" onclick="scrolltop();drawCalc()" title="計算！"><div></div></div>
+  </div>
+  <footer>
+    <hr />
+    <nav id="footerrnav">
+    </nav>
+    ドロー確率計算機 (<span id="version"></span>) | &copy;2020-2024 <a href="https://twitter.com/WingTSK" target="_blank">WingTSK</a>
+  </footer>
 </body>
 </html>
